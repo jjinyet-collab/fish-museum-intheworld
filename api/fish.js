@@ -1,106 +1,99 @@
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  if (req.method === 'OPTIONS') { res.status(200).end(); return; }
- 
-  const { q } = req.query;
-  if (!q) { res.status(400).json({ error: 'query required' }); return; }
- 
+export const config = { runtime: 'edge' };
+
+export default async function handler(req) {
+  const { searchParams } = new URL(req.url);
+  const q = searchParams.get('q');
+
+  if (!q) return new Response(JSON.stringify({ error: 'query required' }), {
+    status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+  });
+
   try {
-    // 1. FishBase에서 학명 검색
-    const searchRes = await fetch(
-      `https://fishbase.ropensci.org/species?genus=${encodeURIComponent(q)}&limit=5`,
-      { headers: { 'Accept': 'application/json' } }
+    // 1. Wikipedia 검색 — 한국어 우선
+    const koSearch = await fetch(
+      `https://ko.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q)}`,
+      { headers: { 'User-Agent': 'FishMuseumApp/1.0' } }
     );
- 
-    // 2. 한국어 이름으로도 검색 시도 (학명 매핑)
-    const commonRes = await fetch(
-      `https://fishbase.ropensci.org/comnames?ComName=${encodeURIComponent(q)}&Language=Korean&limit=5`,
-      { headers: { 'Accept': 'application/json' } }
+
+    // 2. 영어 Wikipedia도 병렬로
+    const enSearch = await fetch(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q + ' fish')}`,
+      { headers: { 'User-Agent': 'FishMuseumApp/1.0' } }
     );
- 
-    let speciesId = null;
-    let speciesData = null;
- 
-    // 학명 검색 결과 처리
-    if (searchRes.ok) {
-      const searchData = await searchRes.json();
-      if (searchData.data && searchData.data.length > 0) {
-        speciesId = searchData.data[0].SpecCode;
-        speciesData = searchData.data[0];
-      }
+
+    const koData = koSearch.ok ? await koSearch.json() : null;
+    const enData = enSearch.ok ? await enSearch.json() : null;
+
+    // 둘 다 없으면
+    if (!koData && !enData) {
+      return new Response(JSON.stringify({ error: 'not found' }), {
+        status: 404, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
     }
- 
-    // 한국어 이름 검색 결과 처리
-    if (!speciesId && commonRes.ok) {
-      const commonData = await commonRes.json();
-      if (commonData.data && commonData.data.length > 0) {
-        speciesId = commonData.data[0].SpecCode;
-      }
-    }
- 
-    // 영어 common name으로도 재시도
-    if (!speciesId) {
-      const engRes = await fetch(
-        `https://fishbase.ropensci.org/comnames?ComName=${encodeURIComponent(q)}&Language=English&limit=5`,
-        { headers: { 'Accept': 'application/json' } }
-      );
-      if (engRes.ok) {
-        const engData = await engRes.json();
-        if (engData.data && engData.data.length > 0) {
-          speciesId = engData.data[0].SpecCode;
-        }
-      }
-    }
- 
-    if (!speciesId) {
-      res.status(404).json({ error: 'not found' }); return;
-    }
- 
-    // 3. 상세 정보 가져오기
-    const [detailRes, ecosysRes, introRes] = await Promise.all([
-      fetch(`https://fishbase.ropensci.org/species/${speciesId}`, { headers: { 'Accept': 'application/json' } }),
-      fetch(`https://fishbase.ropensci.org/ecology?SpecCode=${speciesId}`, { headers: { 'Accept': 'application/json' } }),
-      fetch(`https://fishbase.ropensci.org/comnames?SpecCode=${speciesId}&Language=Korean&limit=1`, { headers: { 'Accept': 'application/json' } }),
-    ]);
- 
-    const detail   = detailRes.ok   ? (await detailRes.json()).data   : null;
-    const ecology  = ecosysRes.ok   ? (await ecosysRes.json()).data   : null;
-    const korean   = introRes.ok    ? (await introRes.json()).data    : null;
- 
-    const sp = detail || speciesData;
-    if (!sp) { res.status(404).json({ error: 'detail not found' }); return; }
- 
-    // 4. 응답 포맷 정리
-    const eco = ecology && ecology.length > 0 ? ecology[0] : {};
- 
-    res.status(200).json({
-      speciesId,
-      scientificName: `${sp.Genus || ''} ${sp.Species || ''}`.trim(),
-      englishName:    sp.FBname || sp.fbname || '',
-      koreanName:     (korean && korean.length > 0) ? korean[0].ComName : '',
-      family:         sp.Family || '',
-      order:          sp.Order  || '',
-      maxLength:      sp.Length    ? `${sp.Length} cm`  : (sp.LengthFemale ? `${sp.LengthFemale} cm` : '-'),
-      commonLength:   sp.CommonLength ? `${sp.CommonLength} cm` : '-',
-      weight:         sp.Weight    ? `${sp.Weight} g`   : '-',
-      lifespan:       sp.LongevityWild ? `${sp.LongevityWild}년` : '-',
-      tempMin:        sp.TempMin   || null,
-      tempMax:        sp.TempMax   || null,
-      temperature:    (sp.TempMin && sp.TempMax) ? `${sp.TempMin}–${sp.TempMax}°C` : '-',
-      phMin:          eco.pHMin    || null,
-      phMax:          eco.pHMax    || null,
-      ph:             (eco.pHMin && eco.pHMax) ? `${eco.pHMin}–${eco.pHMax}` : '-',
-      dangerous:      sp.Dangerous || '-',
-      aquarium:       sp.Aquarium  || '-',
-      habitat:        sp.Comments  || '',
-      picture:        speciesId ? `https://www.fishbase.se/images/species/${sp.PicPreferredName}` : null,
-      iucn:           sp.iucn_version || 'LC',
-      distribution:   sp.Distribution || '',
+
+    const ko = koData?.type === 'standard' ? koData : null;
+    const en = enData?.type === 'standard' ? enData : null;
+
+    const summary = ko?.extract || en?.extract || '';
+    const title   = ko?.title   || en?.title   || q;
+    const enTitle = en?.title   || '';
+    const thumbnail = ko?.thumbnail?.source || en?.thumbnail?.source || null;
+
+    // extract에서 학명 파싱 시도
+    const sciMatch = summary.match(/\(([A-Z][a-z]+ [a-z]+(?:\s[a-z]+)?)\)/);
+    const scientificName = sciMatch ? sciMatch[1] : '';
+
+    // 수온, 수명 등 간단 파싱
+    const tempMatch  = summary.match(/(\d+)[~\-–](\d+)\s*[°℃C]/);
+    const temperature = tempMatch ? `${tempMatch[1]}–${tempMatch[2]}°C` : '-';
+
+    const lifeMatch = summary.match(/(\d+)[~\-–]?(\d+)?\s*년/);
+    const lifespan  = lifeMatch
+      ? (lifeMatch[2] ? `${lifeMatch[1]}–${lifeMatch[2]}년` : `${lifeMatch[1]}년`)
+      : '-';
+
+    const sizeMatch = summary.match(/(\d+(?:\.\d+)?)\s*cm/);
+    const maxSize   = sizeMatch ? `${sizeMatch[1]} cm` : '-';
+
+    // 해수/담수 판별
+    const waterKeywords = ['해수','바다','coral','ocean','marine','reef','saltwater'];
+    const freshKeywords = ['담수','민물','freshwater','river','lake','stream'];
+    const lowerSummary  = summary.toLowerCase();
+    const waterType = waterKeywords.some(k => lowerSummary.includes(k)) ? '해수'
+                    : freshKeywords.some(k => lowerSummary.includes(k)) ? '담수'
+                    : '미확인';
+
+    return new Response(JSON.stringify({
+      koreanName:     title,
+      englishName:    enTitle.replace(/ fish$/i, ''),
+      scientificName,
+      classification: '-',
+      lifespan,
+      maxSize,
+      temperature,
+      ph:             '-',
+      minTank:        '-',
+      conservationStatus: 'LC',
+      difficulty:     '중급자',
+      waterType,
+      price:          '시세 확인 중',
+      habitat:        summary.slice(0, 200) + (summary.length > 200 ? '...' : ''),
+      description:    summary.slice(0, 300) + (summary.length > 300 ? '...' : ''),
+      picture:        thumbnail,
+      tips: [
+        '전문 판매점에 문의해 적정 수조 크기를 확인하세요.',
+        '수질 및 수온을 종에 맞게 유지해주세요.',
+        '합사 가능한 어종을 미리 확인하세요.',
+      ],
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
- 
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+    });
   }
 }
- 
