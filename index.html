@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fish Museum">
+<meta name="theme-color" content="#020f1a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<title>Fish Museum</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; background: #020f1a; font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; }
+
+  #app { width: 100%; max-width: 430px; margin: 0 auto; height: 100dvh; display: flex; flex-direction: column; position: relative; overflow: hidden; background: #020f1a; }
+
+  /* 배경 효과 */
+  .ocean-bg { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .ray { position: absolute; top: -40px; width: 50px; height: 500px; background: linear-gradient(to bottom, rgba(80,200,255,0.07), transparent); border-radius: 50%; }
+  .bubble { position: absolute; border-radius: 50%; background: rgba(100,200,255,0.07); animation: rise linear infinite; }
+  @keyframes rise { 0%{transform:translateY(0) scale(1);opacity:.5} 100%{transform:translateY(-110vh) scale(1.2);opacity:0} }
+
+  /* 스크린 관리 */
+  .screen { display: none; flex-direction: column; flex: 1; overflow: hidden; position: relative; z-index: 1; }
+  .screen.active { display: flex; }
+
+  /* 공통 스크롤 영역 */
+  .scroll-area { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  /* 헤더 */
+  .header { padding: 52px 24px 16px; text-align: center; }
+  .eyebrow { font-size: 10px; letter-spacing: 3px; color: rgba(80,200,255,0.5); text-transform: uppercase; margin-bottom: 6px; }
+  .logo { font-size: 30px; font-weight: 600; color: #fff; letter-spacing: 1px; }
+  .logo span { color: #50c8ff; }
+  .tagline { font-size: 12px; color: rgba(255,255,255,0.28); margin-top: 4px; }
+
+  /* 스캐너 */
+  .scanner-wrap { padding: 12px 20px; }
+  .scanner-frame { border: 1.5px solid rgba(80,200,255,0.2); border-radius: 20px; overflow: hidden; background: rgba(0,30,60,0.5); }
+  .scanner-view { position: relative; width: 100%; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
+  .scanner-view img#preview { position: absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none; }
+  .scan-idle { display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 1; }
+  .scan-ring { width: 64px; height: 64px; border-radius: 50%; border: 1.5px solid rgba(80,200,255,0.4); display: flex; align-items: center; justify-content: center; }
+  .scan-ring svg { width: 26px; height: 26px; stroke: #50c8ff; fill: none; stroke-width: 1.5; }
+  .scan-lbl { font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500; }
+  .scan-sub { font-size: 11px; color: rgba(255,255,255,0.3); }
+  .corner { position: absolute; width: 18px; height: 18px; }
+  .corner.tl { top:12px; left:12px; border-top:2px solid #50c8ff; border-left:2px solid #50c8ff; border-radius:3px 0 0 0; }
+  .corner.tr { top:12px; right:12px; border-top:2px solid #50c8ff; border-right:2px solid #50c8ff; border-radius:0 3px 0 0; }
+  .corner.bl { bottom:12px; left:12px; border-bottom:2px solid #50c8ff; border-left:2px solid #50c8ff; border-radius:0 0 0 3px; }
+  .corner.br { bottom:12px; right:12px; border-bottom:2px solid #50c8ff; border-right:2px solid #50c8ff; border-radius:0 0 3px 0; }
+  .scan-line { position:absolute; left:0; right:0; height:1.5px; background:linear-gradient(to right,transparent,#50c8ff,transparent); animation:scanMove 2.4s ease-in-out infinite; display:none; z-index:3; }
+  @keyframes scanMove { 0%{top:10%} 50%{top:85%} 100%{top:10%} }
+  .scanner-foot { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-top:1px solid rgba(80,200,255,0.08); }
+  .scan-status { font-size:12px; color:rgba(80,200,255,0.45); }
+  .scan-btn { padding:7px 20px; background:#50c8ff; color:#020f1a; border:none; border-radius:99px; font-size:13px; font-weight:600; cursor:pointer; display:none; }
+  .scan-btn:disabled { opacity:.5; }
+
+  /* 컬렉션 */
+  .sec-lbl { font-size:10px; letter-spacing:2px; color:rgba(80,200,255,0.45); text-transform:uppercase; padding:16px 20px 8px; }
+  .fish-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 20px; }
+  .fish-card { background:rgba(0,40,70,0.6); border:1px solid rgba(80,200,255,0.1); border-radius:16px; padding:16px; cursor:pointer; transition:border-color .2s; }
+  .fish-card:active { border-color:rgba(80,200,255,0.35); }
+  .fish-card-emoji { font-size:36px; margin-bottom:8px; }
+  .fish-card-name { font-size:14px; font-weight:500; color:rgba(255,255,255,0.88); }
+  .fish-card-sub { font-size:11px; color:rgba(255,255,255,0.28); font-style:italic; margin-top:2px; }
+  .water-badge { display:inline-block; margin-top:8px; padding:2px 8px; border:1px solid; border-radius:99px; font-size:11px; }
+  .fish-card-price { font-size:13px; color:#50c8ff; margin-top:6px; font-weight:500; }
+
+  /* 상세 화면 */
+  .back-btn { padding:52px 20px 8px; display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .back-btn svg { width:18px; height:18px; stroke:rgba(255,255,255,0.4); fill:none; stroke-width:2; }
+  .back-lbl { font-size:13px; color:rgba(255,255,255,0.4); }
+  .detail-hero { background:#031828; padding:24px; text-align:center; border-bottom:1px solid rgba(80,200,255,0.1); }
+  .detail-no { font-size:10px; letter-spacing:3px; color:rgba(80,200,255,0.5); }
+  .detail-emoji { font-size:56px; margin:8px 0; }
+  .detail-name { font-size:24px; font-weight:600; color:#fff; }
+  .detail-latin { font-size:13px; color:rgba(80,200,255,0.65); font-style:italic; margin-top:3px; }
+  .badge-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; justify-content:center; }
+  .badge { padding:3px 10px; border:1px solid rgba(80,200,255,0.25); border-radius:99px; font-size:11px; color:rgba(80,200,255,0.7); }
+  .badge.green { border-color:rgba(80,200,150,0.3); color:rgba(80,200,150,0.8); }
+  .badge.amber { border-color:rgba(240,160,60,0.3); color:rgba(240,160,60,0.8); }
+
+  .detail-body { padding:20px; }
+  .d-sec-lbl { font-size:10px; letter-spacing:2px; color:rgba(80,200,255,0.45); text-transform:uppercase; margin:18px 0 10px; }
+  .d-sec-lbl:first-child { margin-top:0; }
+  .info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .chip { background:rgba(0,40,70,0.7); border:1px solid rgba(80,200,255,0.1); border-radius:12px; padding:10px 8px; text-align:center; }
+  .chip-lbl { font-size:10px; color:rgba(255,255,255,0.3); margin-bottom:4px; }
+  .chip-val { font-size:12px; font-weight:500; color:rgba(255,255,255,0.82); line-height:1.3; }
+  .habitat-box { background:rgba(0,40,70,0.5); border:1px solid rgba(80,200,255,0.1); border-radius:12px; padding:14px; }
+  .habitat-txt { font-size:13px; color:rgba(255,255,255,0.55); line-height:1.75; }
+  .desc-txt { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.75; }
+  .divider { height:1px; background:rgba(80,200,255,0.07); margin:18px 0; }
+  .tip-row { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid rgba(80,200,255,0.06); }
+  .tip-row:last-child { border-bottom:none; }
+  .tip-dot { width:5px; height:5px; border-radius:50%; background:#50c8ff; margin-top:7px; opacity:.6; flex-shrink:0; }
+  .tip-txt { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.6; flex:1; }
+
+  /* 구매 바 */
+  .buy-bar { position:absolute; bottom:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-top:1px solid rgba(80,200,255,0.08); background:rgba(2,15,26,0.97); padding-bottom:calc(14px + env(safe-area-inset-bottom)); }
+  .price-lbl { font-size:11px; color:rgba(255,255,255,0.3); margin-bottom:2px; }
+  .price-val { font-size:20px; font-weight:600; color:#50c8ff; }
+  .buy-btn-ui { padding:11px 24px; background:#50c8ff; color:#020f1a; border:none; border-radius:99px; font-size:14px; font-weight:600; cursor:pointer; }
+
+  /* 결과 카드 */
+  .result-section { display:none; padding:16px 20px 24px; }
+  .result-name { font-size:22px; font-weight:600; color:#fff; }
+  .result-latin { font-size:12px; color:rgba(80,200,255,0.65); font-style:italic; margin-top:3px; }
+  .result-badge { display:inline-block; margin-top:8px; padding:3px 10px; border:1px solid rgba(80,200,255,0.3); border-radius:99px; font-size:11px; color:rgba(80,200,255,0.7); }
+  .error-msg { font-size:13px; color:rgba(255,100,100,0.8); text-align:center; padding:8px 0; display:none; }
+  .reset-btn { width:100%; margin-top:16px; padding:11px; background:transparent; border:1px solid rgba(80,200,255,0.2); border-radius:99px; font-size:13px; color:rgba(80,200,255,0.7); cursor:pointer; }
+
+  /* 하단 네비 */
+  .bottom-nav { position:absolute; bottom:0; left:0; right:0; display:flex; border-top:1px solid rgba(80,200,255,0.08); padding-bottom:env(safe-area-inset-bottom); background:rgba(2,15,26,0.97); z-index:10; }
+  .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 0; cursor:pointer; }
+  .nav-item svg { width:20px; height:20px; stroke:rgba(255,255,255,0.22); fill:none; stroke-width:1.5; }
+  .nav-item.active svg { stroke:#50c8ff; }
+  .nav-lbl { font-size:10px; color:rgba(255,255,255,0.22); }
+  .nav-item.active .nav-lbl { color:#50c8ff; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- 배경 -->
+  <div class="ocean-bg" id="ocean-bg"></div>
+
+  <!-- 홈 화면 -->
+  <div class="screen active" id="screen-home">
+    <div class="scroll-area">
+      <div class="header">
+        <div class="eyebrow">World Aquatic Encyclopedia</div>
+        <div class="logo">Fish <span>Museum</span></div>
+        <div class="tagline">Discover the world beneath the surface</div>
+      </div>
+
+      <div class="scanner-wrap">
+        <div class="scanner-frame">
+          <div class="scanner-view" id="scanner-view" onclick="document.getElementById('file-input').click()">
+            <img id="preview">
+            <div class="scan-idle" id="scan-idle">
+              <div class="scan-ring">
+                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+              <div class="scan-lbl">물고기 사진 업로드</div>
+              <div class="scan-sub">tap to identify a fish</div>
+            </div>
+            <div class="corner tl"></div>
+            <div class="corner tr"></div>
+            <div class="corner bl"></div>
+            <div class="corner br"></div>
+            <div class="scan-line" id="scan-line"></div>
+          </div>
+          <div class="scanner-foot">
+            <span class="scan-status" id="scan-status">준비됨</span>
+            <button class="scan-btn" id="scan-btn" onclick="event.stopPropagation(); scanFish()">스캔 시작</button>
+          </div>
+        </div>
+        <div class="error-msg" id="error-msg"></div>
+      </div>
+
+      <div class="result-section" id="result-section">
+        <div class="result-name" id="r-name"></div>
+        <div class="result-latin" id="r-latin"></div>
+        <div class="result-badge" id="r-badge"></div>
+        <div class="d-sec-lbl" style="margin-top:14px;">기본 정보</div>
+        <div class="info-grid">
+          <div class="chip"><div class="chip-lbl">수명</div><div class="chip-val" id="r-life"></div></div>
+          <div class="chip"><div class="chip-lbl">크기</div><div class="chip-val" id="r-size"></div></div>
+          <div class="chip"><div class="chip-lbl">수온</div><div class="chip-val" id="r-temp"></div></div>
+          <div class="chip"><div class="chip-lbl">분류</div><div class="chip-val" id="r-class"></div></div>
+          <div class="chip"><div class="chip-lbl">보존</div><div class="chip-val" id="r-status"></div></div>
+          <div class="chip"><div class="chip-lbl">난이도</div><div class="chip-val" id="r-level"></div></div>
+        </div>
+        <div class="d-sec-lbl">서식지 & 분포</div>
+        <div class="habitat-box"><div class="habitat-txt" id="r-habitat"></div></div>
+        <div class="d-sec-lbl">특징 & 생태</div>
+        <div class="desc-txt" id="r-desc"></div>
+        <button class="reset-btn" onclick="resetScanner()">+ 다른 물고기 스캔하기</button>
+      </div>
+
+      <div class="sec-lbl">컬렉션</div>
+      <div class="fish-grid" id="fish-grid"></div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span class="nav-lbl">스캔</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="nav-lbl">도감</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span class="nav-lbl">서식지</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="nav-lbl">마켓</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="nav-lbl">마이</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 상세 화면 -->
+  <div class="screen" id="screen-detail">
+    <div class="scroll-area" style="padding-bottom:120px;">
+      <div class="back-btn" onclick="showScreen('home')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        <span class="back-lbl">컬렉션으로</span>
+      </div>
+      <div class="detail-hero">
+        <div class="detail-no" id="d-no"></div>
+        <div class="detail-emoji" id="d-emoji"></div>
+        <div class="detail-name" id="d-name"></div>
+        <div class="detail-latin" id="d-latin"></div>
+        <div class="badge-row" id="d-badges"></div>
+      </div>
+      <div class="detail-body">
+        <div class="d-sec-lbl">기본 정보</div>
+        <div class="info-grid" id="d-info"></div>
+        <div class="d-sec-lbl">서식지 & 분포</div>
+        <div class="habitat-box"><div class="habitat-txt" id="d-habitat"></div></div>
+        <div class="d-sec-lbl">특징 & 생태</div>
+        <div class="desc-txt" id="d-desc"></div>
+        <div class="divider"></div>
+        <div class="d-sec-lbl">사육 팁</div>
+        <div id="d-tips"></div>
+      </div>
+    </div>
+    <div class="buy-bar">
+      <div>
+        <div class="price-lbl">마켓 최저가</div>
+        <div class="price-val" id="d-price"></div>
+      </div>
+      <button class="buy-btn-ui">마켓에서 구매</button>
+    </div>
+  </div>
+
+  <input type="file" id="file-input" accept="image/*" style="display:none">
+</div>
+
+<script>
+// ── 도감 데이터 ─────────────────────────────────────────
+const FISH = [
+  {
+    id:'0023', emoji:'🐠', koreanName:'흰동가리', englishName:'Clownfish',
+    scientificName:'Amphiprion ocellaris', classification:'농어목 자리돔과',
+    lifespan:'6–10년', maxSize:'11 cm', temperature:'24–28°C', ph:'8.1–8.4',
+    minTank:'76 L', conservationStatus:'LC', difficulty:'초보자', waterType:'해수',
+    price:'₩ 15,000~',
+    habitat:'인도양 동부와 서태평양 전역에 분포. 인도네시아·필리핀·호주 북부 연안, 수심 1–15m 산호초 지대와 석호에 서식. Heteractis magnifica 등 말미잘과 공생.',
+    description:'주황색 바탕에 흰색 세 줄 무늬가 특징. 말미잘 독성에 면역인 점액층을 분비. 모든 개체는 수컷으로 태어나며 암컷 사망 시 가장 큰 수컷이 암컷으로 성전환하는 순차적 자웅동체.',
+    tips:['최소 76L 해수 수조, 염도 1.020–1.025 유지','말미잘 없이도 사육·번식 가능','수컷끼리 합사 시 공격성 주의','라이언피시·곰치와 합사 금지'],
+  },
+  {
+    id:'0024', emoji:'🐟', koreanName:'레오파드 부시피시', englishName:'Leopard Bushfish',
+    scientificName:'Ctenopoma acutirostre', classification:'농어목 아나반티다에과',
+    lifespan:'10–15년', maxSize:'15–20 cm', temperature:'23–28°C', ph:'6.0–7.5',
+    minTank:'150 L', conservationStatus:'LC', difficulty:'중급자', waterType:'담수',
+    price:'₩ 35,000~',
+    habitat:'콩고강 중류 유역 전역 분포. 콩고공화국·콩고민주공화국에 걸쳐 서식. 수초가 빽빽한 느린 하천, 늪지대에서 미로기관으로 대기 중 산소를 직접 호흡.',
+    description:'표범 무늬 반점 패턴을 가진 중형 담수어. 낙엽을 흉내 내는 위장 전략으로 먹잇감에 매복 접근. 성적 성숙까지 5–10년이 걸리는 매우 느린 성장 속도.',
+    tips:['소형어와 합사 절대 금지','수면 부엽식물로 조도 낮추기','냉동 장구벌레·브라인쉬림프 급여 권장','점프 방지 뚜껑 필수'],
+  },
+];
+
+// ── 배경 생성 ──────────────────────────────────────────
+(function() {
+  const bg = document.getElementById('ocean-bg');
+  [[10,'-15deg'],[35,'5deg'],[62,'-8deg'],[82,'12deg']].forEach(([l,r]) => {
+    const el = document.createElement('div');
+    el.className = 'ray';
+    el.style.cssText = `left:${l}%;transform:rotate(${r})`;
+    bg.appendChild(el);
+  });
+  for (let i = 0; i < 16; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const s = 5 + Math.random() * 18;
+    b.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:${Math.random()*80}%;animation-duration:${8+Math.random()*12}s;animation-delay:${Math.random()*8}s`;
+    bg.appendChild(b);
+  }
+})();
+
+// ── 컬렉션 카드 렌더 ───────────────────────────────────
+function renderGrid() {
+  const grid = document.getElementById('fish-grid');
+  grid.innerHTML = FISH.map(f => `
+    <div class="fish-card" onclick="openDetail('${f.id}')">
+      <div class="fish-card-emoji">${f.emoji}</div>
+      <div class="fish-card-name">${f.koreanName}</div>
+      <div class="fish-card-sub">${f.scientificName}</div>
+      <div class="water-badge" style="border-color:${f.waterType==='해수'?'rgba(80,200,255,0.3)':'rgba(80,200,150,0.3)'};color:${f.waterType==='해수'?'#50c8ff':'rgba(80,200,150,0.8)'}">
+        ${f.waterType}
+      </div>
+      <div class="fish-card-price">${f.price}</div>
+    </div>
+  `).join('');
+}
+
+// ── 상세 화면 ─────────────────────────────────────────
+function openDetail(id) {
+  const f = FISH.find(x => x.id === id);
+  if (!f) return;
+  document.getElementById('d-no').textContent = `Fish Museum · 도감 #${f.id}`;
+  document.getElementById('d-emoji').textContent = f.emoji;
+  document.getElementById('d-name').textContent = f.koreanName;
+  document.getElementById('d-latin').textContent = f.scientificName;
+  document.getElementById('d-price').textContent = f.price;
+  document.getElementById('d-habitat').textContent = f.habitat;
+  document.getElementById('d-desc').textContent = f.description;
+  document.getElementById('d-badges').innerHTML = [
+    `<span class="badge">${f.englishName}</span>`,
+    `<span class="badge">${f.classification}</span>`,
+    `<span class="badge green">IUCN ${f.conservationStatus}</span>`,
+    `<span class="badge amber">${f.waterType}</span>`,
+  ].join('');
+  document.getElementById('d-info').innerHTML = [
+    ['수명', f.lifespan], ['최대 크기', f.maxSize], ['수온', f.temperature],
+    ['pH', f.ph], ['최소 수조', f.minTank], ['난이도', f.difficulty],
+  ].map(([l,v]) => `<div class="chip"><div class="chip-lbl">${l}</div><div class="chip-val">${v}</div></div>`).join('');
+  document.getElementById('d-tips').innerHTML = f.tips.map(t =>
+    `<div class="tip-row"><div class="tip-dot"></div><div class="tip-txt">${t}</div></div>`
+  ).join('');
+  showScreen('detail');
+}
+
+// ── 화면 전환 ─────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+// ── 스캐너 ────────────────────────────────────────────
+let imgBase64 = null, imgType = null;
+
+document.getElementById('file-input').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  imgType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = ev => {
+    imgBase64 = ev.target.result.split(',')[1];
+    const preview = document.getElementById('preview');
+    preview.src = ev.target.result;
+    preview.style.display = 'block';
+    document.getElementById('scan-idle').style.display = 'none';
+    document.getElementById('scan-btn').style.display = 'block';
+    document.getElementById('scan-status').textContent = '사진 준비됨';
+    document.getElementById('result-section').style.display = 'none';
+    document.getElementById('error-msg').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+
+async function scanFish() {
+  if (!imgBase64) return;
+  const btn = document.getElementById('scan-btn');
+  btn.disabled = true; btn.textContent = '분석 중...';
+  document.getElementById('scan-line').style.display = 'block';
+  document.getElementById('scan-status').textContent = '종 분류 중...';
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('result-section').style.display = 'none';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: imgType, data: imgBase64 } },
+            { type: 'text', text: `You are an expert ichthyologist. Identify this fish and return ONLY valid JSON, no markdown, no backticks:\n{"koreanName":"","englishName":"","scientificName":"","confidence":"높음/중간/낮음","classification":"","lifespan":"","maxSize":"","temperature":"","conservationStatus":"","difficulty":"초보자/중급/고급","habitat":"(한국어 2-3문장)","description":"(한국어 3-4문장)"}\nIf no fish, set koreanName to "인식불가".` }
+          ]
+        }]
+      })
+    });
+    const data = await res.json();
+    const raw = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    const m = raw.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('파싱 실패');
+    const f = JSON.parse(m[0]);
+    if (f.koreanName === '인식불가') { showError('물고기를 인식하지 못했어요. 더 선명한 사진을 올려주세요.'); return; }
+
+    document.getElementById('r-name').textContent = f.koreanName;
+    document.getElementById('r-latin').textContent = f.scientificName;
+    document.getElementById('r-badge').textContent = `${f.englishName} · 신뢰도 ${f.confidence}`;
+    document.getElementById('r-life').textContent = f.lifespan||'-';
+    document.getElementById('r-size').textContent = f.maxSize||'-';
+    document.getElementById('r-temp').textContent = f.temperature||'-';
+    document.getElementById('r-class').textContent = f.classification||'-';
+    document.getElementById('r-status').textContent = f.conservationStatus||'-';
+    document.getElementById('r-level').textContent = f.difficulty||'-';
+    document.getElementById('r-habitat').textContent = f.habitat||'-';
+    document.getElementById('r-desc').textContent = f.description||'-';
+    document.getElementById('result-section').style.display = 'block';
+    document.getElementById('scan-status').textContent = '스캔 완료';
+
+    // 도감에 추가
+    if (!FISH.find(x => x.scientificName === f.scientificName)) {
+      FISH.unshift({
+        id: String(FISH.length + 25).padStart(4,'0'),
+        emoji: '🐠', koreanName: f.koreanName, englishName: f.englishName,
+        scientificName: f.scientificName, classification: f.classification,
+        lifespan: f.lifespan, maxSize: f.maxSize, temperature: f.temperature,
+        ph: '-', minTank: '-', conservationStatus: f.conservationStatus,
+        difficulty: f.difficulty, waterType: '미확인', price: '시세 확인 중',
+        habitat: f.habitat, description: f.description, tips: ['사육 정보를 확인 중입니다.'],
+      });
+      renderGrid();
+    }
+  } catch(err) {
+    showError('오류: ' + err.message);
+  } finally {
+    document.getElementById('scan-line').style.display = 'none';
+    btn.disabled = false; btn.textContent = '다시 스캔';
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg; el.style.display = 'block';
+  document.getElementById('scan-line').style.display = 'none';
+  document.getElementById('scan-status').textContent = '오류';
+  document.getElementById('scan-btn').disabled = false;
+  document.getElementById('scan-btn').textContent = '다시 스캔';
+}
+
+function resetScanner() {
+  imgBase64 = null;
+  document.getElementById('preview').style.display = 'none';
+  document.getElementById('preview').src = '';
+  document.getElementById('scan-idle').style.display = 'flex';
+  document.getElementById('scan-btn').style.display = 'none';
+  document.getElementById('result-section').style.display = 'none';
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('scan-status').textContent = '준비됨';
+  document.getElementById('file-input').value = '';
+}
+
+renderGrid();
+</script>
+</body>
+</html>
