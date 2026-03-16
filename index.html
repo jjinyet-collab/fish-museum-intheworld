@@ -2,453 +2,620 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fish Museum">
-<meta name="theme-color" content="#020f1a">
+<meta name="theme-color" content="#08090f">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.png">
 <title>Fish Museum</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; overflow: hidden; background: #020f1a; font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; }
-
-  #app { width: 100%; max-width: 430px; margin: 0 auto; height: 100dvh; display: flex; flex-direction: column; position: relative; overflow: hidden; background: #020f1a; }
-
-  /* 배경 효과 */
-  .ocean-bg { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-  .ray { position: absolute; top: -40px; width: 50px; height: 500px; background: linear-gradient(to bottom, rgba(80,200,255,0.07), transparent); border-radius: 50%; }
-  .bubble { position: absolute; border-radius: 50%; background: rgba(100,200,255,0.07); animation: rise linear infinite; }
-  @keyframes rise { 0%{transform:translateY(0) scale(1);opacity:.5} 100%{transform:translateY(-110vh) scale(1.2);opacity:0} }
-
-  /* 스크린 관리 */
-  .screen { display: none; flex-direction: column; flex: 1; overflow: hidden; position: relative; z-index: 1; }
-  .screen.active { display: flex; }
-
-  /* 공통 스크롤 영역 */
-  .scroll-area { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
-  .scroll-area::-webkit-scrollbar { display: none; }
-
-  /* 헤더 */
-  .header { padding: 52px 24px 16px; text-align: center; }
-  .eyebrow { font-size: 10px; letter-spacing: 3px; color: rgba(80,200,255,0.5); text-transform: uppercase; margin-bottom: 6px; }
-  .logo { font-size: 30px; font-weight: 600; color: #fff; letter-spacing: 1px; }
-  .logo span { color: #50c8ff; }
-  .tagline { font-size: 12px; color: rgba(255,255,255,0.28); margin-top: 4px; }
-
-  /* 스캐너 */
-  .scanner-wrap { padding: 12px 20px; }
-  .scanner-frame { border: 1.5px solid rgba(80,200,255,0.2); border-radius: 20px; overflow: hidden; background: rgba(0,30,60,0.5); }
-  .scanner-view { position: relative; width: 100%; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
-  .scanner-view img#preview { position: absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none; }
-  .scan-idle { display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 1; }
-  .scan-ring { width: 64px; height: 64px; border-radius: 50%; border: 1.5px solid rgba(80,200,255,0.4); display: flex; align-items: center; justify-content: center; }
-  .scan-ring svg { width: 26px; height: 26px; stroke: #50c8ff; fill: none; stroke-width: 1.5; }
-  .scan-lbl { font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500; }
-  .scan-sub { font-size: 11px; color: rgba(255,255,255,0.3); }
-  .corner { position: absolute; width: 18px; height: 18px; }
-  .corner.tl { top:12px; left:12px; border-top:2px solid #50c8ff; border-left:2px solid #50c8ff; border-radius:3px 0 0 0; }
-  .corner.tr { top:12px; right:12px; border-top:2px solid #50c8ff; border-right:2px solid #50c8ff; border-radius:0 3px 0 0; }
-  .corner.bl { bottom:12px; left:12px; border-bottom:2px solid #50c8ff; border-left:2px solid #50c8ff; border-radius:0 0 0 3px; }
-  .corner.br { bottom:12px; right:12px; border-bottom:2px solid #50c8ff; border-right:2px solid #50c8ff; border-radius:0 0 3px 0; }
-  .scan-line { position:absolute; left:0; right:0; height:1.5px; background:linear-gradient(to right,transparent,#50c8ff,transparent); animation:scanMove 2.4s ease-in-out infinite; display:none; z-index:3; }
-  @keyframes scanMove { 0%{top:10%} 50%{top:85%} 100%{top:10%} }
-  .scanner-foot { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-top:1px solid rgba(80,200,255,0.08); }
-  .scan-status { font-size:12px; color:rgba(80,200,255,0.45); }
-  .scan-btn { padding:7px 20px; background:#50c8ff; color:#020f1a; border:none; border-radius:99px; font-size:13px; font-weight:600; cursor:pointer; display:none; }
-  .scan-btn:disabled { opacity:.5; }
-
-  /* 컬렉션 */
-  .sec-lbl { font-size:10px; letter-spacing:2px; color:rgba(80,200,255,0.45); text-transform:uppercase; padding:16px 20px 8px; }
-  .fish-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 20px; }
-  .fish-card { background:rgba(0,40,70,0.6); border:1px solid rgba(80,200,255,0.1); border-radius:16px; padding:16px; cursor:pointer; transition:border-color .2s; }
-  .fish-card:active { border-color:rgba(80,200,255,0.35); }
-  .fish-card-emoji { font-size:36px; margin-bottom:8px; }
-  .fish-card-name { font-size:14px; font-weight:500; color:rgba(255,255,255,0.88); }
-  .fish-card-sub { font-size:11px; color:rgba(255,255,255,0.28); font-style:italic; margin-top:2px; }
-  .water-badge { display:inline-block; margin-top:8px; padding:2px 8px; border:1px solid; border-radius:99px; font-size:11px; }
-  .fish-card-price { font-size:13px; color:#50c8ff; margin-top:6px; font-weight:500; }
-
-  /* 상세 화면 */
-  .back-btn { padding:52px 20px 8px; display:flex; align-items:center; gap:6px; cursor:pointer; }
-  .back-btn svg { width:18px; height:18px; stroke:rgba(255,255,255,0.4); fill:none; stroke-width:2; }
-  .back-lbl { font-size:13px; color:rgba(255,255,255,0.4); }
-  .detail-hero { background:#031828; padding:24px; text-align:center; border-bottom:1px solid rgba(80,200,255,0.1); }
-  .detail-no { font-size:10px; letter-spacing:3px; color:rgba(80,200,255,0.5); }
-  .detail-emoji { font-size:56px; margin:8px 0; }
-  .detail-name { font-size:24px; font-weight:600; color:#fff; }
-  .detail-latin { font-size:13px; color:rgba(80,200,255,0.65); font-style:italic; margin-top:3px; }
-  .badge-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; justify-content:center; }
-  .badge { padding:3px 10px; border:1px solid rgba(80,200,255,0.25); border-radius:99px; font-size:11px; color:rgba(80,200,255,0.7); }
-  .badge.green { border-color:rgba(80,200,150,0.3); color:rgba(80,200,150,0.8); }
-  .badge.amber { border-color:rgba(240,160,60,0.3); color:rgba(240,160,60,0.8); }
-
-  .detail-body { padding:20px; }
-  .d-sec-lbl { font-size:10px; letter-spacing:2px; color:rgba(80,200,255,0.45); text-transform:uppercase; margin:18px 0 10px; }
-  .d-sec-lbl:first-child { margin-top:0; }
-  .info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-  .chip { background:rgba(0,40,70,0.7); border:1px solid rgba(80,200,255,0.1); border-radius:12px; padding:10px 8px; text-align:center; }
-  .chip-lbl { font-size:10px; color:rgba(255,255,255,0.3); margin-bottom:4px; }
-  .chip-val { font-size:12px; font-weight:500; color:rgba(255,255,255,0.82); line-height:1.3; }
-  .habitat-box { background:rgba(0,40,70,0.5); border:1px solid rgba(80,200,255,0.1); border-radius:12px; padding:14px; }
-  .habitat-txt { font-size:13px; color:rgba(255,255,255,0.55); line-height:1.75; }
-  .desc-txt { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.75; }
-  .divider { height:1px; background:rgba(80,200,255,0.07); margin:18px 0; }
-  .tip-row { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid rgba(80,200,255,0.06); }
-  .tip-row:last-child { border-bottom:none; }
-  .tip-dot { width:5px; height:5px; border-radius:50%; background:#50c8ff; margin-top:7px; opacity:.6; flex-shrink:0; }
-  .tip-txt { font-size:13px; color:rgba(255,255,255,0.5); line-height:1.6; flex:1; }
-
-  /* 구매 바 */
-  .buy-bar { position:absolute; bottom:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-top:1px solid rgba(80,200,255,0.08); background:rgba(2,15,26,0.97); padding-bottom:calc(14px + env(safe-area-inset-bottom)); }
-  .price-lbl { font-size:11px; color:rgba(255,255,255,0.3); margin-bottom:2px; }
-  .price-val { font-size:20px; font-weight:600; color:#50c8ff; }
-  .buy-btn-ui { padding:11px 24px; background:#50c8ff; color:#020f1a; border:none; border-radius:99px; font-size:14px; font-weight:600; cursor:pointer; }
-
-  /* 결과 카드 */
-  .result-section { display:none; padding:16px 20px 24px; }
-  .result-name { font-size:22px; font-weight:600; color:#fff; }
-  .result-latin { font-size:12px; color:rgba(80,200,255,0.65); font-style:italic; margin-top:3px; }
-  .result-badge { display:inline-block; margin-top:8px; padding:3px 10px; border:1px solid rgba(80,200,255,0.3); border-radius:99px; font-size:11px; color:rgba(80,200,255,0.7); }
-  .error-msg { font-size:13px; color:rgba(255,100,100,0.8); text-align:center; padding:8px 0; display:none; }
-  .reset-btn { width:100%; margin-top:16px; padding:11px; background:transparent; border:1px solid rgba(80,200,255,0.2); border-radius:99px; font-size:13px; color:rgba(80,200,255,0.7); cursor:pointer; }
-
-  /* 하단 네비 */
-  .bottom-nav { position:absolute; bottom:0; left:0; right:0; display:flex; border-top:1px solid rgba(80,200,255,0.08); padding-bottom:env(safe-area-inset-bottom); background:rgba(2,15,26,0.97); z-index:10; }
-  .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 0; cursor:pointer; }
-  .nav-item svg { width:20px; height:20px; stroke:rgba(255,255,255,0.22); fill:none; stroke-width:1.5; }
-  .nav-item.active svg { stroke:#50c8ff; }
-  .nav-lbl { font-size:10px; color:rgba(255,255,255,0.22); }
-  .nav-item.active .nav-lbl { color:#50c8ff; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',sans-serif;color:#fff}
+#app{position:relative;width:100%;max-width:430px;margin:0 auto;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+ 
+/* ─── BG AURORA (상단 절반만) ─── */
+.bg{position:absolute;inset:0;z-index:0;background:#08090f}
+#cv{
+  position:absolute;top:0;left:0;
+  width:100%;
+  /* 상단 45%만 차지 */
+  height:45%;
+  display:block;
+}
+/* 캔버스 하단 페이드 */
+.bg-fade{
+  position:absolute;top:0;left:0;right:0;
+  height:55%;
+  background:linear-gradient(to bottom,
+    transparent 0%,
+    transparent 55%,
+    rgba(8,9,15,0.75) 72%,
+    rgba(8,9,15,0.97) 88%,
+    #08090f 100%
+  );
+  pointer-events:none;
+}
+ 
+/* ─── SCREENS ─── */
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden;position:relative;z-index:1}
+.screen.active{display:flex}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:96px}
+.scroll::-webkit-scrollbar{display:none}
+ 
+/* ─── TOP BAR ─── */
+.topbar{
+  padding:54px 22px 0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{display:flex;align-items:center;gap:11px}
+.logo-icon{
+  width:34px;height:34px;border-radius:9px;
+  background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);
+}
+.logo-icon svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:1.8}
+.logo-words{line-height:1}
+.logo-main{font-size:15px;font-weight:500;letter-spacing:-.3px;color:#fff}
+.logo-sub{font-size:9px;font-weight:500;letter-spacing:2.5px;color:rgba(255,255,255,0.38);text-transform:uppercase;margin-top:2px}
+.avatar{
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.18);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.avatar svg{width:16px;height:16px;stroke:rgba(255,255,255,0.55);fill:none;stroke-width:1.8}
+ 
+/* ─── HERO — 레퍼런스처럼 큰 타이틀 ─── */
+.hero{padding:28px 22px 0}
+.hero-sm{font-size:14px;color:rgba(255,255,255,0.45);margin-bottom:8px;font-weight:400}
+.hero-lg{
+  font-size:38px;font-weight:500;
+  line-height:1.08;letter-spacing:-1.8px;color:#fff;
+}
+.hero-lg em{font-style:normal;color:rgba(160,190,255,0.85)}
+ 
+/* ─── SEARCH ─── */
+.sw{padding:22px 22px 0}
+.sbox{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:14px;padding:12px 16px;
+  backdrop-filter:blur(20px);
+}
+.sbox svg{flex-shrink:0;width:15px;height:15px;stroke:rgba(255,255,255,0.28);fill:none;stroke-width:2}
+.sinput{flex:1;background:none;border:none;outline:none;font-family:'Inter',sans-serif;font-size:14px;color:#fff}
+.sinput::placeholder{color:rgba(255,255,255,0.2)}
+.sclear{background:none;border:none;color:rgba(255,255,255,0.3);font-size:20px;cursor:pointer;display:none;line-height:1;padding:0}
+ 
+/* ─── SCANNER ─── */
+.scnw{padding:14px 22px 0}
+.scnf{
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:18px;overflow:hidden;
+  background:rgba(10,12,22,0.55);backdrop-filter:blur(20px);
+}
+.scnv{position:relative;width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
+.scnv img#prev{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.scni{display:flex;flex-direction:column;align-items:center;gap:10px;z-index:1}
+.scnr{width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(160,190,255,0.4);display:flex;align-items:center;justify-content:center}
+.scnr svg{width:20px;height:20px;stroke:rgba(160,190,255,0.9);fill:none;stroke-width:1.5}
+.scnlbl{font-size:13px;font-weight:500;color:rgba(255,255,255,0.45)}
+.scnsub{font-size:11px;color:rgba(255,255,255,0.18);letter-spacing:.3px}
+.corner{position:absolute;width:15px;height:15px}
+.corner.tl{top:11px;left:11px;border-top:1.5px solid rgba(160,190,255,0.6);border-left:1.5px solid rgba(160,190,255,0.6);border-radius:3px 0 0 0}
+.corner.tr{top:11px;right:11px;border-top:1.5px solid rgba(160,190,255,0.6);border-right:1.5px solid rgba(160,190,255,0.6);border-radius:0 3px 0 0}
+.corner.bl{bottom:11px;left:11px;border-bottom:1.5px solid rgba(160,190,255,0.6);border-left:1.5px solid rgba(160,190,255,0.6);border-radius:0 0 0 3px}
+.corner.br{bottom:11px;right:11px;border-bottom:1.5px solid rgba(160,190,255,0.6);border-right:1.5px solid rgba(160,190,255,0.6);border-radius:0 0 3px 0}
+.sline{position:absolute;left:0;right:0;height:1.5px;background:linear-gradient(to right,transparent,rgba(160,190,255,0.8),transparent);animation:scanm 2.4s ease-in-out infinite;display:none;z-index:3}
+@keyframes scanm{0%{top:10%}50%{top:86%}100%{top:10%}}
+.scnft{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;border-top:1px solid rgba(255,255,255,0.06)}
+.sstat{font-size:10px;font-weight:500;letter-spacing:1px;color:rgba(160,190,255,0.4);text-transform:uppercase}
+.sbtn{padding:7px 18px;background:rgba(55,100,255,0.9);color:#fff;border:none;border-radius:99px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;display:none}
+.sbtn:disabled{opacity:.35}
+.errmsg{margin:8px 22px 0;font-size:13px;color:rgba(255,100,100,0.8);display:none}
+ 
+/* ─── CTA ─── */
+.ctaw{padding:14px 22px 0}
+.ctab{
+  width:100%;display:flex;align-items:center;gap:14px;
+  background:rgba(40,80,255,0.75);
+  border:1px solid rgba(100,140,255,0.25);
+  border-radius:16px;padding:14px 18px;cursor:pointer;
+  position:relative;overflow:hidden;
+  backdrop-filter:blur(10px);
+}
+.ctab::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,0.06),transparent);
+  transform:translateX(-100%);animation:sh 3s ease-in-out infinite;
+}
+@keyframes sh{to{transform:translateX(200%)}}
+.ctai{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ctai svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+.ctam{font-size:14px;font-weight:500;color:#fff;letter-spacing:-.2px}
+.ctasb{font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px}
+.ctarr{margin-left:auto;color:rgba(255,255,255,0.35);font-size:18px}
+ 
+/* ─── RESULT ─── */
+.rsec{padding:14px 22px 0;display:none}
+.rname{font-size:22px;font-weight:500;color:#fff;letter-spacing:-.4px}
+.rlat{font-size:12px;color:rgba(160,190,255,0.8);font-style:italic;margin-top:3px}
+.rconf{display:inline-block;margin-top:8px;padding:3px 10px;background:rgba(100,140,255,0.1);border:1px solid rgba(100,140,255,0.22);border-radius:99px;font-size:10px;font-weight:500;letter-spacing:.5px;color:rgba(160,190,255,0.9)}
+ 
+/* ─── LABELS ─── */
+.sec{font-size:10px;font-weight:500;letter-spacing:2.5px;color:rgba(255,255,255,0.2);text-transform:uppercase;padding:16px 22px 10px}
+ 
+/* ─── CHIPS ─── */
+.igrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:0 22px}
+.chip{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:11px 8px;text-align:center}
+.clbl{font-size:9px;font-weight:500;letter-spacing:1.5px;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:4px}
+.cval{font-size:12px;font-weight:500;color:rgba(255,255,255,0.85);line-height:1.3}
+ 
+/* ─── BOXES ─── */
+.box{margin:0 22px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px}
+.boxt{font-size:13px;color:rgba(255,255,255,0.48);line-height:1.75}
+.plain{padding:0 22px;font-size:13px;color:rgba(255,255,255,0.48);line-height:1.75}
+.divl{height:1px;background:rgba(255,255,255,0.06);margin:16px 22px}
+.trow{display:flex;gap:10px;align-items:flex-start;padding:8px 22px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.trow:last-child{border-bottom:none}
+.tdot{width:3px;height:3px;border-radius:50%;background:rgba(160,190,255,0.6);margin-top:8px;flex-shrink:0}
+.ttxt{font-size:13px;color:rgba(255,255,255,0.48);line-height:1.65;flex:1}
+.ghost{display:block;width:calc(100% - 44px);margin:14px 22px 0;padding:12px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:99px;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;letter-spacing:1.5px;color:rgba(255,255,255,0.35);cursor:pointer;text-align:center;text-transform:uppercase}
+ 
+/* ─── COLLECTION ─── */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 22px}
+.ccard{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:16px;cursor:pointer;backdrop-filter:blur(8px);animation:fu .4s ease both}
+.ccard:active{background:rgba(255,255,255,0.09)}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.ce{font-size:28px;margin-bottom:10px}
+.cn{font-size:14px;font-weight:500;color:rgba(255,255,255,0.88);letter-spacing:-.2px}
+.clat{font-size:10px;color:rgba(255,255,255,0.22);font-style:italic;margin-top:2px}
+.cbadge{display:inline-block;margin-top:8px;padding:2px 8px;border:1px solid;border-radius:99px;font-size:9px;font-weight:500;letter-spacing:.5px}
+.cprice{font-size:13px;font-weight:500;color:rgba(160,190,255,0.9);margin-top:6px}
+.empty{padding:48px 22px;text-align:center}
+.empty-i{font-size:30px;opacity:.18;margin-bottom:10px}
+.empty-t{font-size:10px;font-weight:500;letter-spacing:2.5px;color:rgba(255,255,255,0.18);text-transform:uppercase}
+ 
+/* ─── DETAIL ─── */
+.backrow{padding:54px 22px 8px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.backrow svg{width:18px;height:18px;stroke:rgba(255,255,255,0.38);fill:none;stroke-width:2}
+.backlbl{font-size:11px;font-weight:500;letter-spacing:1.5px;color:rgba(255,255,255,0.38);text-transform:uppercase}
+.dhero{padding:20px 22px 22px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06)}
+.dno{font-size:9px;font-weight:500;letter-spacing:3px;color:rgba(255,255,255,0.18);text-transform:uppercase;margin-bottom:4px}
+.demoji{font-size:52px;margin:8px 0}
+.dname{font-size:26px;font-weight:500;color:#fff;letter-spacing:-.5px}
+.dlatin{font-size:12px;color:rgba(160,190,255,0.8);font-style:italic;margin-top:4px}
+.brow{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;justify-content:center}
+.b{padding:3px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:99px;font-size:10px;font-weight:500;color:rgba(255,255,255,0.45)}
+.b.g{background:rgba(34,197,94,0.07);border-color:rgba(34,197,94,0.2);color:rgba(134,239,172,0.85)}
+.b.a{background:rgba(251,191,36,0.07);border-color:rgba(251,191,36,0.2);color:rgba(253,224,71,0.85)}
+ 
+.buybar{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-top:1px solid rgba(255,255,255,0.06);background:rgba(8,9,15,0.92);backdrop-filter:blur(20px);padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+.plbl{font-size:10px;font-weight:500;color:rgba(255,255,255,0.22);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.pval{font-size:22px;font-weight:500;color:rgba(160,190,255,0.9);letter-spacing:-.5px}
+.buybtn{padding:11px 24px;background:rgba(40,80,255,0.9);color:#fff;border:none;border-radius:99px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer}
+ 
+/* ─── BOTTOM NAV ─── */
+.bnav{position:absolute;bottom:0;left:0;right:0;display:flex;border-top:1px solid rgba(255,255,255,0.06);padding-bottom:env(safe-area-inset-bottom);background:rgba(8,9,15,0.92);backdrop-filter:blur(20px);z-index:10}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0;cursor:pointer}
+.ni svg{width:19px;height:19px;stroke:rgba(255,255,255,0.18);fill:none;stroke-width:1.5}
+.ni.active svg{stroke:#fff}
+.nil{font-size:9px;font-weight:500;letter-spacing:1px;color:rgba(255,255,255,0.18);text-transform:uppercase}
+.ni.active .nil{color:#fff}
 </style>
 </head>
 <body>
 <div id="app">
-  <!-- 배경 -->
-  <div class="ocean-bg" id="ocean-bg"></div>
-
-  <!-- 홈 화면 -->
+  <div class="bg">
+    <canvas id="cv"></canvas>
+    <div class="bg-fade"></div>
+  </div>
+ 
+  <!-- HOME -->
   <div class="screen active" id="screen-home">
-    <div class="scroll-area">
-      <div class="header">
-        <div class="eyebrow">World Aquatic Encyclopedia</div>
-        <div class="logo">Fish <span>Museum</span></div>
-        <div class="tagline">Discover the world beneath the surface</div>
+    <div class="scroll">
+      <div class="topbar">
+        <div class="logo">
+          <svg width="148" height="34" viewBox="0 0 148 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 웨이브 아치 3개 (Museo Moderno 스타일) -->
+            <path d="M4 26 C4 26 4 8 11 8 C18 8 18 26 18 26" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M18 26 C18 26 18 8 25 8 C32 8 32 26 32 26" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M32 26 C32 26 32 8 39 8 C46 8 46 26 46 26" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <!-- teal dot -->
+            <circle cx="50" cy="26" r="2.5" fill="rgba(160,190,255,0.9)"/>
+            <!-- FISH -->
+            <text x="58" y="20" font-family="Inter,sans-serif" font-size="13" font-weight="500" fill="white" letter-spacing="1.5">FISH</text>
+            <!-- MUSEUM -->
+            <text x="58" y="32" font-family="Inter,sans-serif" font-size="9" font-weight="400" fill="rgba(255,255,255,0.38)" letter-spacing="3">MUSEUM</text>
+          </svg>
+        </div>
+        <div class="avatar">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
       </div>
-
-      <div class="scanner-wrap">
-        <div class="scanner-frame">
-          <div class="scanner-view" id="scanner-view" onclick="document.getElementById('file-input').click()">
-            <img id="preview">
-            <div class="scan-idle" id="scan-idle">
-              <div class="scan-ring">
-                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              </div>
-              <div class="scan-lbl">물고기 사진 업로드</div>
-              <div class="scan-sub">tap to identify a fish</div>
+ 
+      <div class="hero">
+        <div class="hero-sm">안녕하세요 👋</div>
+        <div class="hero-lg">Discover the<br>world <em>beneath</em><br>the surface</div>
+      </div>
+ 
+      <div class="sw">
+        <div class="sbox">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="sinput" id="sinput" type="text" placeholder="물고기 이름 검색 후 엔터..." autocomplete="off" oninput="onSearchFilter(this.value)" onkeydown="if(event.key==='Enter')searchFish(this.value)">
+          <button class="sclear" id="sclear" onclick="clearSearch()">×</button>
+        </div>
+      </div>
+ 
+      <div class="scnw">
+        <div class="scnf">
+          <div class="scnv" id="sv" onclick="document.getElementById('fi').click()">
+            <img id="prev">
+            <div class="scni" id="idle">
+              <div class="scnr"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+              <div class="scnlbl">물고기 사진 업로드</div>
+              <div class="scnsub">Tap to identify a fish</div>
             </div>
-            <div class="corner tl"></div>
-            <div class="corner tr"></div>
-            <div class="corner bl"></div>
-            <div class="corner br"></div>
-            <div class="scan-line" id="scan-line"></div>
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <div class="sline" id="sl"></div>
           </div>
-          <div class="scanner-foot">
-            <span class="scan-status" id="scan-status">준비됨</span>
-            <button class="scan-btn" id="scan-btn" onclick="event.stopPropagation(); scanFish()">스캔 시작</button>
+          <div class="scnft">
+            <span class="sstat" id="ss">Ready</span>
+            <button class="sbtn" id="sbt" onclick="event.stopPropagation();scanFish()">Scan</button>
           </div>
         </div>
-        <div class="error-msg" id="error-msg"></div>
+        <div class="errmsg" id="em"></div>
       </div>
-
-      <div class="result-section" id="result-section">
-        <div class="result-name" id="r-name"></div>
-        <div class="result-latin" id="r-latin"></div>
-        <div class="result-badge" id="r-badge"></div>
-        <div class="d-sec-lbl" style="margin-top:14px;">기본 정보</div>
-        <div class="info-grid">
-          <div class="chip"><div class="chip-lbl">수명</div><div class="chip-val" id="r-life"></div></div>
-          <div class="chip"><div class="chip-lbl">크기</div><div class="chip-val" id="r-size"></div></div>
-          <div class="chip"><div class="chip-lbl">수온</div><div class="chip-val" id="r-temp"></div></div>
-          <div class="chip"><div class="chip-lbl">분류</div><div class="chip-val" id="r-class"></div></div>
-          <div class="chip"><div class="chip-lbl">보존</div><div class="chip-val" id="r-status"></div></div>
-          <div class="chip"><div class="chip-lbl">난이도</div><div class="chip-val" id="r-level"></div></div>
+ 
+      <div class="ctaw">
+        <button class="ctab" onclick="document.getElementById('fi').click()">
+          <div class="ctai"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          <div><div class="ctam">새 물고기 스캔하기</div><div class="ctasb">사진으로 종 자동 인식 →</div></div>
+          <span class="ctarr">›</span>
+        </button>
+      </div>
+ 
+      <div class="rsec" id="rsec">
+        <div class="rname" id="rn"></div>
+        <div class="rlat" id="rl"></div>
+        <div class="rconf" id="rc"></div>
+        <div class="sec" style="padding-top:14px">기본 정보</div>
+        <div class="igrid">
+          <div class="chip"><div class="clbl">수명</div><div class="cval" id="rv1"></div></div>
+          <div class="chip"><div class="clbl">크기</div><div class="cval" id="rv2"></div></div>
+          <div class="chip"><div class="clbl">수온</div><div class="cval" id="rv3"></div></div>
+          <div class="chip"><div class="clbl">분류</div><div class="cval" id="rv4"></div></div>
+          <div class="chip"><div class="clbl">보존</div><div class="cval" id="rv5"></div></div>
+          <div class="chip"><div class="clbl">난이도</div><div class="cval" id="rv6"></div></div>
         </div>
-        <div class="d-sec-lbl">서식지 & 분포</div>
-        <div class="habitat-box"><div class="habitat-txt" id="r-habitat"></div></div>
-        <div class="d-sec-lbl">특징 & 생태</div>
-        <div class="desc-txt" id="r-desc"></div>
-        <button class="reset-btn" onclick="resetScanner()">+ 다른 물고기 스캔하기</button>
+        <div class="sec">서식지</div>
+        <div class="box"><div class="boxt" id="rh"></div></div>
+        <div class="sec">특징 & 생태</div>
+        <div class="plain" id="rd"></div>
+        <button class="ghost" onclick="resetScan()">+ 다른 물고기 스캔</button>
       </div>
-
-      <div class="sec-lbl">컬렉션</div>
-      <div class="fish-grid" id="fish-grid"></div>
+ 
+      <div class="sec" id="clbl">내 컬렉션</div>
+      <div class="cgrid" id="cgrid"></div>
+      <div class="empty" id="emp" style="display:none">
+        <div class="empty-i">🔍</div><div class="empty-t">검색 결과 없음</div>
+      </div>
     </div>
-    <div class="bottom-nav">
-      <div class="nav-item active">
+ 
+    <div class="bnav">
+      <div class="ni active" onclick="setNav(this)">
         <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        <span class="nav-lbl">스캔</span>
+        <span class="nil">Scan</span>
       </div>
-      <div class="nav-item">
+      <div class="ni" onclick="setNav(this)">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span class="nav-lbl">도감</span>
+        <span class="nil">Collection</span>
       </div>
-      <div class="nav-item">
+      <div class="ni" onclick="setNav(this)">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        <span class="nav-lbl">서식지</span>
+        <span class="nil">Habitat</span>
       </div>
-      <div class="nav-item">
+      <div class="ni" onclick="setNav(this)">
         <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        <span class="nav-lbl">마켓</span>
+        <span class="nil">Market</span>
       </div>
-      <div class="nav-item">
+      <div class="ni" onclick="setNav(this)">
         <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span class="nav-lbl">마이</span>
+        <span class="nil">My</span>
       </div>
     </div>
   </div>
-
-  <!-- 상세 화면 -->
+ 
+  <!-- DETAIL -->
   <div class="screen" id="screen-detail">
-    <div class="scroll-area" style="padding-bottom:120px;">
-      <div class="back-btn" onclick="showScreen('home')">
+    <div class="scroll" style="padding-bottom:110px">
+      <div class="backrow" onclick="showScreen('home')">
         <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        <span class="back-lbl">컬렉션으로</span>
+        <span class="backlbl">Collection</span>
       </div>
-      <div class="detail-hero">
-        <div class="detail-no" id="d-no"></div>
-        <div class="detail-emoji" id="d-emoji"></div>
-        <div class="detail-name" id="d-name"></div>
-        <div class="detail-latin" id="d-latin"></div>
-        <div class="badge-row" id="d-badges"></div>
+      <div class="dhero">
+        <div class="dno" id="dno"></div>
+        <div class="demoji" id="demoji"></div>
+        <div class="dname" id="dname"></div>
+        <div class="dlatin" id="dlatin"></div>
+        <div class="brow" id="dbadges"></div>
       </div>
-      <div class="detail-body">
-        <div class="d-sec-lbl">기본 정보</div>
-        <div class="info-grid" id="d-info"></div>
-        <div class="d-sec-lbl">서식지 & 분포</div>
-        <div class="habitat-box"><div class="habitat-txt" id="d-habitat"></div></div>
-        <div class="d-sec-lbl">특징 & 생태</div>
-        <div class="desc-txt" id="d-desc"></div>
-        <div class="divider"></div>
-        <div class="d-sec-lbl">사육 팁</div>
-        <div id="d-tips"></div>
-      </div>
+      <div class="sec">기본 정보</div>
+      <div class="igrid" id="dinfo"></div>
+      <div class="sec">서식지 & 분포</div>
+      <div class="box"><div class="boxt" id="dhab"></div></div>
+      <div class="sec">특징 & 생태</div>
+      <div class="plain" id="ddesc"></div>
+      <div class="divl"></div>
+      <div class="sec">사육 팁</div>
+      <div id="dtips"></div>
     </div>
-    <div class="buy-bar">
-      <div>
-        <div class="price-lbl">마켓 최저가</div>
-        <div class="price-val" id="d-price"></div>
-      </div>
-      <button class="buy-btn-ui">마켓에서 구매</button>
+    <div class="buybar">
+      <div><div class="plbl">마켓 최저가</div><div class="pval" id="dprice"></div></div>
+      <button class="buybtn">구매하기</button>
     </div>
   </div>
-
-  <input type="file" id="file-input" accept="image/*" style="display:none">
+ 
+  <input type="file" id="fi" accept="image/*" style="display:none">
 </div>
-
+ 
 <script>
-// ── 도감 데이터 ─────────────────────────────────────────
-const FISH = [
-  {
-    id:'0023', emoji:'🐠', koreanName:'흰동가리', englishName:'Clownfish',
-    scientificName:'Amphiprion ocellaris', classification:'농어목 자리돔과',
-    lifespan:'6–10년', maxSize:'11 cm', temperature:'24–28°C', ph:'8.1–8.4',
-    minTank:'76 L', conservationStatus:'LC', difficulty:'초보자', waterType:'해수',
-    price:'₩ 15,000~',
-    habitat:'인도양 동부와 서태평양 전역에 분포. 인도네시아·필리핀·호주 북부 연안, 수심 1–15m 산호초 지대와 석호에 서식. Heteractis magnifica 등 말미잘과 공생.',
-    description:'주황색 바탕에 흰색 세 줄 무늬가 특징. 말미잘 독성에 면역인 점액층을 분비. 모든 개체는 수컷으로 태어나며 암컷 사망 시 가장 큰 수컷이 암컷으로 성전환하는 순차적 자웅동체.',
-    tips:['최소 76L 해수 수조, 염도 1.020–1.025 유지','말미잘 없이도 사육·번식 가능','수컷끼리 합사 시 공격성 주의','라이언피시·곰치와 합사 금지'],
-  },
-  {
-    id:'0024', emoji:'🐟', koreanName:'레오파드 부시피시', englishName:'Leopard Bushfish',
-    scientificName:'Ctenopoma acutirostre', classification:'농어목 아나반티다에과',
-    lifespan:'10–15년', maxSize:'15–20 cm', temperature:'23–28°C', ph:'6.0–7.5',
-    minTank:'150 L', conservationStatus:'LC', difficulty:'중급자', waterType:'담수',
-    price:'₩ 35,000~',
-    habitat:'콩고강 중류 유역 전역 분포. 콩고공화국·콩고민주공화국에 걸쳐 서식. 수초가 빽빽한 느린 하천, 늪지대에서 미로기관으로 대기 중 산소를 직접 호흡.',
-    description:'표범 무늬 반점 패턴을 가진 중형 담수어. 낙엽을 흉내 내는 위장 전략으로 먹잇감에 매복 접근. 성적 성숙까지 5–10년이 걸리는 매우 느린 성장 속도.',
-    tips:['소형어와 합사 절대 금지','수면 부엽식물로 조도 낮추기','냉동 장구벌레·브라인쉬림프 급여 권장','점프 방지 뚜껑 필수'],
-  },
-];
-
-// ── 배경 생성 ──────────────────────────────────────────
-(function() {
-  const bg = document.getElementById('ocean-bg');
-  [[10,'-15deg'],[35,'5deg'],[62,'-8deg'],[82,'12deg']].forEach(([l,r]) => {
-    const el = document.createElement('div');
-    el.className = 'ray';
-    el.style.cssText = `left:${l}%;transform:rotate(${r})`;
-    bg.appendChild(el);
-  });
-  for (let i = 0; i < 16; i++) {
-    const b = document.createElement('div');
-    b.className = 'bubble';
-    const s = 5 + Math.random() * 18;
-    b.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:${Math.random()*80}%;animation-duration:${8+Math.random()*12}s;animation-delay:${Math.random()*8}s`;
-    bg.appendChild(b);
+/* ══════════════════════════════════════════════════
+   AURORA — 애플 뮤직 스타일
+   포인트 이동 없음. 알파(밝기)만 sin으로 숨쉬듯 변화.
+   레퍼런스 컬러: 좌상 중간파랑, 우상 밝은파랑, 중앙 딥네이비
+══════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('cv');
+  const ctx    = canvas.getContext('2d');
+  const app    = document.getElementById('app');
+ 
+  function resize(){
+    canvas.width  = app.offsetWidth  || 390;
+    canvas.height = Math.round((app.offsetHeight || 844) * 0.46);
   }
+  resize();
+  window.addEventListener('resize', resize);
+ 
+  /* 위치 고정, 알파만 변하는 포인트들
+     base: 기준 알파, amp: 진폭, spd: 속도, ph: 위상 */
+  const pts = [
+    { x:0.20, y:0.15, r:0.85, R:30,  G:60,  B:200, base:0.55, amp:0.25, spd:0.0008, ph:0.0   },
+    { x:0.78, y:0.08, r:0.65, R:55,  G:100, B:255, base:0.60, amp:0.20, spd:0.0008, ph:1.5   },
+    { x:0.50, y:0.55, r:0.70, R:15,  G:30,  B:110, base:0.40, amp:0.15, spd:0.0008, ph:3.0   },
+    { x:0.08, y:0.80, r:0.90, R:18,  G:28,  B:85,  base:0.50, amp:0.18, spd:0.0008, ph:2.0   },
+  ];
+ 
+  let t = 0;
+ 
+  function draw(){
+    const W = canvas.width;
+    const H = canvas.height;
+ 
+    ctx.fillStyle = '#080c20';
+    ctx.fillRect(0, 0, W, H);
+ 
+    pts.forEach(p => {
+      const a   = p.base + p.amp * Math.sin(t * p.spd + p.ph);
+      const cx  = p.x * W;
+      const cy  = p.y * H;
+      const rad = p.r * Math.min(W, H);
+ 
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+      g.addColorStop(0,    `rgba(${p.R},${p.G},${p.B},${a})`);
+      g.addColorStop(0.45, `rgba(${p.R},${p.G},${p.B},${a * 0.45})`);
+      g.addColorStop(0.80, `rgba(${p.R},${p.G},${p.B},${a * 0.10})`);
+      g.addColorStop(1,    `rgba(${p.R},${p.G},${p.B},0)`);
+ 
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    });
+ 
+    /* 하단 페이드 */
+    const fade = ctx.createLinearGradient(0, H * 0.5, 0, H);
+    fade.addColorStop(0, 'rgba(8,9,15,0)');
+    fade.addColorStop(1, 'rgba(8,9,15,1)');
+    ctx.fillStyle = fade;
+    ctx.fillRect(0, 0, W, H);
+ 
+    t++;
+    requestAnimationFrame(draw);
+  }
+ 
+  draw();
 })();
-
-// ── 컬렉션 카드 렌더 ───────────────────────────────────
-function renderGrid() {
-  const grid = document.getElementById('fish-grid');
-  grid.innerHTML = FISH.map(f => `
-    <div class="fish-card" onclick="openDetail('${f.id}')">
-      <div class="fish-card-emoji">${f.emoji}</div>
-      <div class="fish-card-name">${f.koreanName}</div>
-      <div class="fish-card-sub">${f.scientificName}</div>
-      <div class="water-badge" style="border-color:${f.waterType==='해수'?'rgba(80,200,255,0.3)':'rgba(80,200,150,0.3)'};color:${f.waterType==='해수'?'#50c8ff':'rgba(80,200,150,0.8)'}">
-        ${f.waterType}
-      </div>
-      <div class="fish-card-price">${f.price}</div>
-    </div>
-  `).join('');
+ 
+/* ══════════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════════ */
+const FISH=[
+  {id:'0023',emoji:'🐠',koreanName:'흰동가리',englishName:'Clownfish',scientificName:'Amphiprion ocellaris',classification:'농어목 자리돔과',lifespan:'6–10년',maxSize:'11 cm',temperature:'24–28°C',ph:'8.1–8.4',minTank:'76 L',conservationStatus:'LC',difficulty:'초보자',waterType:'해수',price:'₩ 15,000~',habitat:'인도양 동부와 서태평양 전역에 분포. 인도네시아·필리핀·호주 북부 연안, 수심 1–15m 산호초 지대와 석호에 서식.',description:'주황색 바탕에 흰색 세 줄 무늬가 특징. 말미잘과 공생하며 독성에 면역인 점액층을 분비. 모든 개체는 수컷으로 태어나며 성전환하는 순차적 자웅동체.',tips:['최소 76L 해수 수조, 염도 1.020–1.025 유지','말미잘 없이도 사육·번식 가능','수컷끼리 합사 시 공격성 주의']},
+  {id:'0024',emoji:'🐟',koreanName:'레오파드 부시피시',englishName:'Leopard Bushfish',scientificName:'Ctenopoma acutirostre',classification:'농어목 아나반티다에과',lifespan:'10–15년',maxSize:'15–20 cm',temperature:'23–28°C',ph:'6.0–7.5',minTank:'150 L',conservationStatus:'LC',difficulty:'중급자',waterType:'담수',price:'₩ 35,000~',habitat:'콩고강 중류 유역 전역 분포. 수초가 빽빽한 느린 하천과 늪지대에서 미로기관으로 대기 중 산소를 직접 호흡.',description:'표범 무늬 반점 패턴을 가진 중형 담수어. 낙엽을 흉내 내는 위장 전략으로 매복 접근하는 포식자.',tips:['소형어와 합사 절대 금지','수면 부엽식물로 조도 낮추기','냉동 장구벌레·브라인쉬림프 급여 권장','점프 방지 뚜껑 필수']},
+];
+ 
+function renderGrid(data){
+  data=data||FISH;
+  const g=document.getElementById('cgrid'),e=document.getElementById('emp');
+  if(!data.length){g.innerHTML='';e.style.display='block';return}
+  e.style.display='none';
+  g.innerHTML=data.map((f,i)=>`
+    <div class="ccard" style="animation-delay:${i*.07}s" onclick="openDetail('${f.id}')">
+      <div class="ce">${f.emoji}</div><div class="cn">${f.koreanName}</div>
+      <div class="clat">${f.scientificName}</div>
+      <div class="cbadge" style="border-color:${f.waterType==='해수'?'rgba(160,190,255,0.35)':'rgba(134,239,172,0.35)'};color:${f.waterType==='해수'?'rgba(160,190,255,0.85)':'rgba(134,239,172,0.85)'}">${f.waterType}</div>
+      <div class="cprice">${f.price}</div>
+    </div>`).join('');
 }
-
-// ── 상세 화면 ─────────────────────────────────────────
-function openDetail(id) {
-  const f = FISH.find(x => x.id === id);
-  if (!f) return;
-  document.getElementById('d-no').textContent = `Fish Museum · 도감 #${f.id}`;
-  document.getElementById('d-emoji').textContent = f.emoji;
-  document.getElementById('d-name').textContent = f.koreanName;
-  document.getElementById('d-latin').textContent = f.scientificName;
-  document.getElementById('d-price').textContent = f.price;
-  document.getElementById('d-habitat').textContent = f.habitat;
-  document.getElementById('d-desc').textContent = f.description;
-  document.getElementById('d-badges').innerHTML = [
-    `<span class="badge">${f.englishName}</span>`,
-    `<span class="badge">${f.classification}</span>`,
-    `<span class="badge green">IUCN ${f.conservationStatus}</span>`,
-    `<span class="badge amber">${f.waterType}</span>`,
+ 
+/* 타이핑 중 — 컬렉션 내 필터만 */
+function onSearchFilter(q){
+  document.getElementById('sclear').style.display=q?'block':'none';
+  if(!q){document.getElementById('clbl').textContent='내 컬렉션';renderGrid(FISH);return}
+  const local=FISH.filter(f=>f.koreanName.includes(q)||f.englishName.toLowerCase().includes(q.toLowerCase())||f.scientificName.toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('clbl').textContent='내 컬렉션';
+  renderGrid(local.length?local:FISH);
+}
+ 
+/* 엔터 — FishBase API 프록시로 검색 */
+async function searchFish(q){
+  q=q.trim();if(!q)return;
+  const lbl=document.getElementById('clbl');
+  lbl.textContent='검색 중...';
+  document.getElementById('cgrid').innerHTML=`<div style="grid-column:span 2;padding:32px 0;text-align:center;font-size:13px;color:rgba(255,255,255,0.3);letter-spacing:.5px;">FishBase 검색 중...</div>`;
+ 
+  /* 로컬 컬렉션에 있으면 바로 표시 */
+  const local=FISH.filter(f=>f.koreanName.includes(q)||f.englishName.toLowerCase().includes(q.toLowerCase())||f.scientificName.toLowerCase().includes(q.toLowerCase()));
+  if(local.length){lbl.textContent='검색 결과';renderGrid(local);return;}
+ 
+  try{
+    const res = await fetch(`/api/fish?q=${encodeURIComponent(q)}`);
+    if(!res.ok) throw new Error('not found');
+    const d = await res.json();
+ 
+    const waterType = (d.habitat||'').toLowerCase().includes('marine')||
+                      (d.distribution||'').toLowerCase().includes('ocean') ? '해수' : '담수';
+ 
+    const fish = {
+      id: String(Date.now()).slice(-4),
+      emoji: '🐠',
+      koreanName:  d.koreanName  || d.englishName || d.scientificName,
+      englishName: d.englishName || '',
+      scientificName: d.scientificName,
+      classification: `${d.order||''} ${d.family||''}`.trim(),
+      lifespan:    d.lifespan    || '-',
+      maxSize:     d.maxLength   || '-',
+      temperature: d.temperature || '-',
+      ph:          d.ph          || '-',
+      minTank:     '-',
+      conservationStatus: d.iucn || 'LC',
+      difficulty:  '중급자',
+      waterType,
+      price: '시세 확인 중',
+      habitat:     d.distribution || d.habitat || '-',
+      description: d.habitat || '-',
+      picture:     d.picture || null,
+      tips:['현지 전문 판매점에 문의하세요.','수질 및 수온을 종에 맞게 유지해주세요.'],
+    };
+ 
+    if(!FISH.find(x=>x.scientificName===fish.scientificName)) FISH.unshift(fish);
+    lbl.textContent='검색 결과';
+    renderGrid([fish]);
+ 
+  }catch(err){
+    lbl.textContent='검색 결과 없음';
+    document.getElementById('cgrid').innerHTML=`<div style="grid-column:span 2;padding:32px 0;text-align:center;font-size:13px;color:rgba(255,255,255,0.3);">"${q}" 결과를 찾지 못했어요</div>`;
+  }
+}
+ 
+function clearSearch(){
+  document.getElementById('sinput').value='';
+  document.getElementById('sclear').style.display='none';
+  document.getElementById('clbl').textContent='내 컬렉션';
+  renderGrid(FISH);
+}
+ 
+function openDetail(id){
+  const f=FISH.find(x=>x.id===id);if(!f)return;
+  document.getElementById('dno').textContent='FISH MUSEUM · #'+f.id;
+  document.getElementById('demoji').textContent=f.emoji;
+  document.getElementById('dname').textContent=f.koreanName;
+  document.getElementById('dlatin').textContent=f.scientificName;
+  document.getElementById('dprice').textContent=f.price;
+  document.getElementById('dhab').textContent=f.habitat;
+  document.getElementById('ddesc').textContent=f.description;
+  document.getElementById('dbadges').innerHTML=[
+    `<span class="b">${f.englishName}</span>`,`<span class="b">${f.classification}</span>`,
+    `<span class="b g">IUCN ${f.conservationStatus}</span>`,`<span class="b a">${f.waterType}</span>`,
   ].join('');
-  document.getElementById('d-info').innerHTML = [
-    ['수명', f.lifespan], ['최대 크기', f.maxSize], ['수온', f.temperature],
-    ['pH', f.ph], ['최소 수조', f.minTank], ['난이도', f.difficulty],
-  ].map(([l,v]) => `<div class="chip"><div class="chip-lbl">${l}</div><div class="chip-val">${v}</div></div>`).join('');
-  document.getElementById('d-tips').innerHTML = f.tips.map(t =>
-    `<div class="tip-row"><div class="tip-dot"></div><div class="tip-txt">${t}</div></div>`
-  ).join('');
+  document.getElementById('dinfo').innerHTML=[
+    ['수명',f.lifespan],['최대 크기',f.maxSize],['수온',f.temperature],
+    ['pH',f.ph],['최소 수조',f.minTank],['난이도',f.difficulty],
+  ].map(([l,v])=>`<div class="chip"><div class="clbl">${l}</div><div class="cval">${v||'-'}</div></div>`).join('');
+  document.getElementById('dtips').innerHTML=(f.tips||[]).map(t=>`<div class="trow"><div class="tdot"></div><div class="ttxt">${t}</div></div>`).join('');
   showScreen('detail');
 }
-
-// ── 화면 전환 ─────────────────────────────────────────
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-}
-
-// ── 스캐너 ────────────────────────────────────────────
-let imgBase64 = null, imgType = null;
-
-document.getElementById('file-input').addEventListener('change', e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  imgType = file.type || 'image/jpeg';
-  const reader = new FileReader();
-  reader.onload = ev => {
-    imgBase64 = ev.target.result.split(',')[1];
-    const preview = document.getElementById('preview');
-    preview.src = ev.target.result;
-    preview.style.display = 'block';
-    document.getElementById('scan-idle').style.display = 'none';
-    document.getElementById('scan-btn').style.display = 'block';
-    document.getElementById('scan-status').textContent = '사진 준비됨';
-    document.getElementById('result-section').style.display = 'none';
-    document.getElementById('error-msg').style.display = 'none';
+ 
+function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+n).classList.add('active')}
+function setNav(el){document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));el.classList.add('active')}
+ 
+let b64=null,btype=null;
+document.getElementById('fi').addEventListener('change',e=>{
+  const file=e.target.files[0];if(!file)return;
+  btype=file.type||'image/jpeg';
+  const r=new FileReader();
+  r.onload=ev=>{
+    b64=ev.target.result.split(',')[1];
+    const p=document.getElementById('prev');p.src=ev.target.result;p.style.display='block';
+    document.getElementById('idle').style.display='none';
+    document.getElementById('sbt').style.display='block';
+    document.getElementById('ss').textContent='Ready to scan';
+    document.getElementById('rsec').style.display='none';
+    document.getElementById('em').style.display='none';
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(file);
 });
-
-async function scanFish() {
-  if (!imgBase64) return;
-  const btn = document.getElementById('scan-btn');
-  btn.disabled = true; btn.textContent = '분석 중...';
-  document.getElementById('scan-line').style.display = 'block';
-  document.getElementById('scan-status').textContent = '종 분류 중...';
-  document.getElementById('error-msg').style.display = 'none';
-  document.getElementById('result-section').style.display = 'none';
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: imgType, data: imgBase64 } },
-            { type: 'text', text: `You are an expert ichthyologist. Identify this fish and return ONLY valid JSON, no markdown, no backticks:\n{"koreanName":"","englishName":"","scientificName":"","confidence":"높음/중간/낮음","classification":"","lifespan":"","maxSize":"","temperature":"","conservationStatus":"","difficulty":"초보자/중급/고급","habitat":"(한국어 2-3문장)","description":"(한국어 3-4문장)"}\nIf no fish, set koreanName to "인식불가".` }
-          ]
-        }]
-      })
+ 
+async function scanFish(){
+  if(!b64)return;
+  const btn=document.getElementById('sbt');
+  btn.disabled=true;btn.textContent='…';
+  document.getElementById('sl').style.display='block';
+  document.getElementById('ss').textContent='Identifying...';
+  document.getElementById('em').style.display='none';
+  document.getElementById('rsec').style.display='none';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:btype,data:b64}},
+          {type:'text',text:'You are an expert ichthyologist. Identify this fish. Return ONLY valid JSON:\n{"koreanName":"","englishName":"","scientificName":"","confidence":"높음/중간/낮음","classification":"","lifespan":"","maxSize":"","temperature":"","conservationStatus":"IUCN등급","difficulty":"초보자/중급/고급","waterType":"해수/담수","habitat":"(한국어 2-3문장)","description":"(한국어 3-4문장)"}\nIf no fish, set koreanName to "인식불가".'}
+        ]}]})
     });
-    const data = await res.json();
-    const raw = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-    const m = raw.match(/\{[\s\S]*\}/);
-    if (!m) throw new Error('파싱 실패');
-    const f = JSON.parse(m[0]);
-    if (f.koreanName === '인식불가') { showError('물고기를 인식하지 못했어요. 더 선명한 사진을 올려주세요.'); return; }
-
-    document.getElementById('r-name').textContent = f.koreanName;
-    document.getElementById('r-latin').textContent = f.scientificName;
-    document.getElementById('r-badge').textContent = `${f.englishName} · 신뢰도 ${f.confidence}`;
-    document.getElementById('r-life').textContent = f.lifespan||'-';
-    document.getElementById('r-size').textContent = f.maxSize||'-';
-    document.getElementById('r-temp').textContent = f.temperature||'-';
-    document.getElementById('r-class').textContent = f.classification||'-';
-    document.getElementById('r-status').textContent = f.conservationStatus||'-';
-    document.getElementById('r-level').textContent = f.difficulty||'-';
-    document.getElementById('r-habitat').textContent = f.habitat||'-';
-    document.getElementById('r-desc').textContent = f.description||'-';
-    document.getElementById('result-section').style.display = 'block';
-    document.getElementById('scan-status').textContent = '스캔 완료';
-
-    // 도감에 추가
-    if (!FISH.find(x => x.scientificName === f.scientificName)) {
-      FISH.unshift({
-        id: String(FISH.length + 25).padStart(4,'0'),
-        emoji: '🐠', koreanName: f.koreanName, englishName: f.englishName,
-        scientificName: f.scientificName, classification: f.classification,
-        lifespan: f.lifespan, maxSize: f.maxSize, temperature: f.temperature,
-        ph: '-', minTank: '-', conservationStatus: f.conservationStatus,
-        difficulty: f.difficulty, waterType: '미확인', price: '시세 확인 중',
-        habitat: f.habitat, description: f.description, tips: ['사육 정보를 확인 중입니다.'],
-      });
+    const data=await res.json();
+    const raw=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    const m=raw.match(/\{[\s\S]*\}/);if(!m)throw new Error('파싱 실패');
+    const f=JSON.parse(m[0]);
+    if(f.koreanName==='인식불가'){showErr('물고기를 인식하지 못했어요.');return}
+    document.getElementById('rn').textContent=f.koreanName;
+    document.getElementById('rl').textContent=f.scientificName;
+    document.getElementById('rc').textContent=f.englishName+' · 신뢰도 '+f.confidence;
+    ['rv1','rv2','rv3','rv4','rv5','rv6'].forEach((id,i)=>{
+      document.getElementById(id).textContent=f[['lifespan','maxSize','temperature','classification','conservationStatus','difficulty'][i]]||'-';
+    });
+    document.getElementById('rh').textContent=f.habitat||'-';
+    document.getElementById('rd').textContent=f.description||'-';
+    document.getElementById('rsec').style.display='block';
+    document.getElementById('ss').textContent='Complete';
+    if(!FISH.find(x=>x.scientificName===f.scientificName)){
+      FISH.unshift({id:String(Date.now()).slice(-4),emoji:'🐠',koreanName:f.koreanName,englishName:f.englishName,scientificName:f.scientificName,classification:f.classification,lifespan:f.lifespan,maxSize:f.maxSize,temperature:f.temperature,ph:'-',minTank:'-',conservationStatus:f.conservationStatus,difficulty:f.difficulty,waterType:f.waterType||'미확인',price:'시세 확인 중',habitat:f.habitat,description:f.description,tips:['사육 정보 확인 중']});
       renderGrid();
     }
-  } catch(err) {
-    showError('오류: ' + err.message);
-  } finally {
-    document.getElementById('scan-line').style.display = 'none';
-    btn.disabled = false; btn.textContent = '다시 스캔';
-  }
+  }catch(err){showErr('오류: '+err.message)}
+  finally{document.getElementById('sl').style.display='none';btn.disabled=false;btn.textContent='Scan'}
 }
-
-function showError(msg) {
-  const el = document.getElementById('error-msg');
-  el.textContent = msg; el.style.display = 'block';
-  document.getElementById('scan-line').style.display = 'none';
-  document.getElementById('scan-status').textContent = '오류';
-  document.getElementById('scan-btn').disabled = false;
-  document.getElementById('scan-btn').textContent = '다시 스캔';
+function showErr(msg){
+  const el=document.getElementById('em');el.textContent=msg;el.style.display='block';
+  document.getElementById('ss').textContent='Error';
+  document.getElementById('sbt').disabled=false;document.getElementById('sbt').textContent='Retry';
+  document.getElementById('sl').style.display='none';
 }
-
-function resetScanner() {
-  imgBase64 = null;
-  document.getElementById('preview').style.display = 'none';
-  document.getElementById('preview').src = '';
-  document.getElementById('scan-idle').style.display = 'flex';
-  document.getElementById('scan-btn').style.display = 'none';
-  document.getElementById('result-section').style.display = 'none';
-  document.getElementById('error-msg').style.display = 'none';
-  document.getElementById('scan-status').textContent = '준비됨';
-  document.getElementById('file-input').value = '';
+function resetScan(){
+  b64=null;
+  const p=document.getElementById('prev');p.style.display='none';p.src='';
+  document.getElementById('idle').style.display='flex';
+  document.getElementById('sbt').style.display='none';
+  document.getElementById('rsec').style.display='none';
+  document.getElementById('em').style.display='none';
+  document.getElementById('ss').textContent='Ready';
+  document.getElementById('fi').value='';
 }
-
+ 
 renderGrid();
 </script>
 </body>
