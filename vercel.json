@@ -1,1 +1,96 @@
-{}
+export const config = { runtime: 'edge' };
+
+export default async function handler(req) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*'
+  };
+
+  const { searchParams } = new URL(req.url);
+  const q = searchParams.get('q');
+  if (!q) return new Response(JSON.stringify({ error: 'query required' }), { status: 400, headers });
+
+  try {
+    // iNaturalist 검색 — 필터 최소화
+    const r = await fetch(
+      `https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(q)}&per_page=1&locale=ko`,
+      { headers: { 'User-Agent': 'FishMuseumApp/1.0' } }
+    );
+
+    if (!r.ok) return new Response(JSON.stringify({ error: 'api error' }), { status: 502, headers });
+
+    const data = await r.json();
+    if (!data.results || data.results.length === 0) {
+      return new Response(JSON.stringify({ error: 'not found' }), { status: 404, headers });
+    }
+
+    const t = data.results[0];
+
+    // 이름 추출
+    const scientificName = t.name || '';
+    const koreanName     = t.preferred_common_name || t.name || q;
+    const englishName    = (t.english_common_name || '').replace(/ fish$/i, '');
+
+    // 분류 추출
+    const ancestors = t.ancestor_ids || [];
+    const family    = t.iconic_taxon_name || '';
+
+    // 사진
+    const picture = t.default_photo?.medium_url || t.default_photo?.url || null;
+
+    // wikipedia 요약 시도
+    let description = '';
+    let habitat     = '';
+    if (t.wikipedia_url) {
+      const wpTitle = t.wikipedia_url.split('/wiki/')[1];
+      if (wpTitle) {
+        const wpRes = await fetch(
+          `https://en.wikipedia.org/api/rest_v1/page/summary/${wpTitle}`,
+          { headers: { 'User-Agent': 'FishMuseumApp/1.0' } }
+        );
+        if (wpRes.ok) {
+          const wp = await wpRes.json();
+          const ex = wp.extract || '';
+          description = ex.slice(0, 300) + (ex.length > 300 ? '...' : '');
+          habitat     = ex.slice(0, 200) + (ex.length > 200 ? '...' : '');
+        }
+      }
+    }
+
+    if (!description) description = `${koreanName}(${scientificName})에 대한 정보입니다.`;
+    if (!habitat)     habitat     = '서식지 정보를 확인 중입니다.';
+
+    // 해수/담수 판별
+    const lw = description.toLowerCase() + ' ' + habitat.toLowerCase();
+    const waterType = ['marine','ocean','coral','reef','saltwater','sea'].some(k=>lw.includes(k)) ? '해수'
+                    : ['freshwater','river','lake','stream','pond'].some(k=>lw.includes(k)) ? '담수'
+                    : '미확인';
+
+    return new Response(JSON.stringify({
+      koreanName,
+      englishName,
+      scientificName,
+      classification: family,
+      lifespan:    '-',
+      maxSize:     '-',
+      temperature: '-',
+      ph:          '-',
+      minTank:     '-',
+      conservationStatus: t.conservation_status?.status_name || 'LC',
+      difficulty:  '중급자',
+      waterType,
+      price:       '시세 확인 중',
+      habitat,
+      description,
+      picture,
+      tips: [
+        '전문 판매점에 문의해 적정 수조 크기를 확인하세요.',
+        '수질 및 수온을 종에 맞게 유지해주세요.',
+        '합사 가능한 어종을 미리 확인하세요.',
+      ],
+    }), { status: 200, headers });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers });
+  }
+}
