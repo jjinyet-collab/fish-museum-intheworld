@@ -14,7 +14,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',sans-serif;color:#fff}
 #app{position:relative;width:100%;max-width:430px;margin:0 auto;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
- 
+
 /* ─── BG AURORA (상단 절반만) ─── */
 .bg{position:absolute;inset:0;z-index:0;background:#08090f}
 #cv{
@@ -37,13 +37,13 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
   );
   pointer-events:none;
 }
- 
+
 /* ─── SCREENS ─── */
 .screen{display:none;flex-direction:column;flex:1;overflow:hidden;position:relative;z-index:1}
 .screen.active{display:flex}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:96px}
 .scroll::-webkit-scrollbar{display:none}
- 
+
 /* ─── TOP BAR ─── */
 .topbar{
   padding:54px 22px 0;
@@ -68,7 +68,7 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
   display:flex;align-items:center;justify-content:center;cursor:pointer;
 }
 .avatar svg{width:16px;height:16px;stroke:rgba(255,255,255,0.55);fill:none;stroke-width:1.8}
- 
+
 /* ─── HERO — 레퍼런스처럼 큰 타이틀 ─── */
 .hero{padding:28px 22px 0}
 .hero-sm{font-size:14px;color:rgba(255,255,255,0.45);margin-bottom:8px;font-weight:400}
@@ -77,7 +77,7 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
   line-height:1.08;letter-spacing:-1.8px;color:#fff;
 }
 .hero-lg em{font-style:normal;color:rgba(160,190,255,0.85)}
- 
+
 /* ─── SEARCH ─── */
 .sw{padding:22px 22px 0}
 .sbox{
@@ -91,7 +91,7 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
 .sinput{flex:1;background:none;border:none;outline:none;font-family:'Inter',sans-serif;font-size:14px;color:#fff}
 .sinput::placeholder{color:rgba(255,255,255,0.2)}
 .sclear{background:none;border:none;color:rgba(255,255,255,0.3);font-size:20px;cursor:pointer;display:none;line-height:1;padding:0}
- 
+
 /* ─── SCANNER ─── */
 .scnw{padding:14px 22px 0}
 .scnf{
@@ -118,7 +118,7 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
 .sbtn{padding:7px 18px;background:rgba(55,100,255,0.9);color:#fff;border:none;border-radius:99px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;display:none}
 .sbtn:disabled{opacity:.35}
 .errmsg{margin:8px 22px 0;font-size:13px;color:rgba(255,100,100,0.8);display:none}
- 
+
 /* ─── CTA ─── */
 .ctaw{padding:14px 22px 0}
 .ctab{
@@ -140,22 +140,22 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
 .ctam{font-size:14px;font-weight:500;color:#fff;letter-spacing:-.2px}
 .ctasb{font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px}
 .ctarr{margin-left:auto;color:rgba(255,255,255,0.35);font-size:18px}
- 
+
 /* ─── RESULT ─── */
 .rsec{padding:14px 22px 0;display:none}
 .rname{font-size:22px;font-weight:500;color:#fff;letter-spacing:-.4px}
 .rlat{font-size:12px;color:rgba(160,190,255,0.8);font-style:italic;margin-top:3px}
 .rconf{display:inline-block;margin-top:8px;padding:3px 10px;background:rgba(100,140,255,0.1);border:1px solid rgba(100,140,255,0.22);border-radius:99px;font-size:10px;font-weight:500;letter-spacing:.5px;color:rgba(160,190,255,0.9)}
- 
+
 /* ─── LABELS ─── */
 .sec{font-size:10px;font-weight:500;letter-spacing:2.5px;color:rgba(255,255,255,0.2);text-transform:uppercase;padding:16px 22px 10px}
- 
+
 /* ─── CHIPS ─── */
 .igrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:0 22px}
 .chip{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:11px 8px;text-align:center}
 .clbl{font-size:9px;font-weight:500;letter-spacing:1.5px;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:4px}
 .cval{font-size:12px;font-weight:500;color:rgba(255,255,255,0.85);line-height:1.3}
- 
+
 /* ─── BOXES ─── */
 .box{margin:0 22px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px}
 .boxt{font-size:13px;color:rgba(255,255,255,0.48);line-height:1.75}
@@ -166,7 +166,7 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
 .tdot{width:3px;height:3px;border-radius:50%;background:rgba(160,190,255,0.6);margin-top:8px;flex-shrink:0}
 .ttxt{font-size:13px;color:rgba(255,255,255,0.48);line-height:1.65;flex:1}
 .ghost{display:block;width:calc(100% - 44px);margin:14px 22px 0;padding:12px;background:none;border:1px solid rgba(255,255,255,0.1);border-radius:99px;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;letter-spacing:1.5px;color:rgba(255,255,255,0.35);cursor:pointer;text-align:center;text-transform:uppercase}
- 
+
 /* ─── COLLECTION ─── */
 .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 22px}
 .ccard{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:16px;cursor:pointer;backdrop-filter:blur(8px);animation:fu .4s ease both}
@@ -180,7 +180,7 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
 .empty{padding:48px 22px;text-align:center}
 .empty-i{font-size:30px;opacity:.18;margin-bottom:10px}
 .empty-t{font-size:10px;font-weight:500;letter-spacing:2.5px;color:rgba(255,255,255,0.18);text-transform:uppercase}
- 
+
 /* ─── DETAIL ─── */
 .backrow{padding:54px 22px 8px;display:flex;align-items:center;gap:8px;cursor:pointer}
 .backrow svg{width:18px;height:18px;stroke:rgba(255,255,255,0.38);fill:none;stroke-width:2}
@@ -194,12 +194,12 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
 .b{padding:3px 10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:99px;font-size:10px;font-weight:500;color:rgba(255,255,255,0.45)}
 .b.g{background:rgba(34,197,94,0.07);border-color:rgba(34,197,94,0.2);color:rgba(134,239,172,0.85)}
 .b.a{background:rgba(251,191,36,0.07);border-color:rgba(251,191,36,0.2);color:rgba(253,224,71,0.85)}
- 
+
 .buybar{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-top:1px solid rgba(255,255,255,0.06);background:rgba(8,9,15,0.92);backdrop-filter:blur(20px);padding-bottom:calc(14px + env(safe-area-inset-bottom))}
 .plbl{font-size:10px;font-weight:500;color:rgba(255,255,255,0.22);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
 .pval{font-size:22px;font-weight:500;color:rgba(160,190,255,0.9);letter-spacing:-.5px}
 .buybtn{padding:11px 24px;background:rgba(40,80,255,0.9);color:#fff;border:none;border-radius:99px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer}
- 
+
 /* ─── BOTTOM NAV ─── */
 .bnav{position:absolute;bottom:0;left:0;right:0;display:flex;border-top:1px solid rgba(255,255,255,0.06);padding-bottom:env(safe-area-inset-bottom);background:rgba(8,9,15,0.92);backdrop-filter:blur(20px);z-index:10}
 .ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0;cursor:pointer}
@@ -215,7 +215,7 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
     <canvas id="cv"></canvas>
     <div class="bg-fade"></div>
   </div>
- 
+
   <!-- HOME -->
   <div class="screen active" id="screen-home">
     <div class="scroll">
@@ -238,12 +238,12 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
           <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
       </div>
- 
+
       <div class="hero">
         <div class="hero-sm">안녕하세요 👋</div>
         <div class="hero-lg">Discover the<br>world <em>beneath</em><br>the surface</div>
       </div>
- 
+
       <div class="sw">
         <div class="sbox">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -251,7 +251,7 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
           <button class="sclear" id="sclear" onclick="clearSearch()">×</button>
         </div>
       </div>
- 
+
       <div class="scnw">
         <div class="scnf">
           <div class="scnv" id="sv" onclick="document.getElementById('fi').click()">
@@ -272,7 +272,7 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
         </div>
         <div class="errmsg" id="em"></div>
       </div>
- 
+
       <div class="ctaw">
         <button class="ctab" onclick="document.getElementById('fi').click()">
           <div class="ctai"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
@@ -280,7 +280,7 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
           <span class="ctarr">›</span>
         </button>
       </div>
- 
+
       <div class="rsec" id="rsec">
         <div class="rname" id="rn"></div>
         <div class="rlat" id="rl"></div>
@@ -300,14 +300,14 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
         <div class="plain" id="rd"></div>
         <button class="ghost" onclick="resetScan()">+ 다른 물고기 스캔</button>
       </div>
- 
+
       <div class="sec" id="clbl">내 컬렉션</div>
       <div class="cgrid" id="cgrid"></div>
       <div class="empty" id="emp" style="display:none">
         <div class="empty-i">🔍</div><div class="empty-t">검색 결과 없음</div>
       </div>
     </div>
- 
+
     <div class="bnav">
       <div class="ni active" onclick="setNav(this)">
         <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -331,7 +331,7 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
       </div>
     </div>
   </div>
- 
+
   <!-- DETAIL -->
   <div class="screen" id="screen-detail">
     <div class="scroll" style="padding-bottom:110px">
@@ -361,10 +361,10 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
       <button class="buybtn">구매하기</button>
     </div>
   </div>
- 
+
   <input type="file" id="fi" accept="image/*" style="display:none">
 </div>
- 
+
 <script>
 /* ══════════════════════════════════════════════════
    AURORA — 애플 뮤직 스타일
@@ -375,14 +375,14 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
   const canvas = document.getElementById('cv');
   const ctx    = canvas.getContext('2d');
   const app    = document.getElementById('app');
- 
+
   function resize(){
     canvas.width  = app.offsetWidth  || 390;
     canvas.height = Math.round((app.offsetHeight || 844) * 0.46);
   }
   resize();
   window.addEventListener('resize', resize);
- 
+
   /* 위치 고정, 알파만 변하는 포인트들
      base: 기준 알파, amp: 진폭, spd: 속도, ph: 위상 */
   const pts = [
@@ -391,54 +391,67 @@ html,body{height:100%;overflow:hidden;background:#08090f;font-family:'Inter',san
     { x:0.50, y:0.55, r:0.70, R:15,  G:30,  B:110, base:0.40, amp:0.15, spd:0.0008, ph:3.0   },
     { x:0.08, y:0.80, r:0.90, R:18,  G:28,  B:85,  base:0.50, amp:0.18, spd:0.0008, ph:2.0   },
   ];
- 
+
   let t = 0;
- 
+
   function draw(){
     const W = canvas.width;
     const H = canvas.height;
- 
+
     ctx.fillStyle = '#080c20';
     ctx.fillRect(0, 0, W, H);
- 
+
     pts.forEach(p => {
       const a   = p.base + p.amp * Math.sin(t * p.spd + p.ph);
       const cx  = p.x * W;
       const cy  = p.y * H;
       const rad = p.r * Math.min(W, H);
- 
+
       const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
       g.addColorStop(0,    `rgba(${p.R},${p.G},${p.B},${a})`);
       g.addColorStop(0.45, `rgba(${p.R},${p.G},${p.B},${a * 0.45})`);
       g.addColorStop(0.80, `rgba(${p.R},${p.G},${p.B},${a * 0.10})`);
       g.addColorStop(1,    `rgba(${p.R},${p.G},${p.B},0)`);
- 
+
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, W, H);
     });
- 
+
     /* 하단 페이드 */
     const fade = ctx.createLinearGradient(0, H * 0.5, 0, H);
     fade.addColorStop(0, 'rgba(8,9,15,0)');
     fade.addColorStop(1, 'rgba(8,9,15,1)');
     ctx.fillStyle = fade;
     ctx.fillRect(0, 0, W, H);
- 
+
     t++;
     requestAnimationFrame(draw);
   }
- 
+
   draw();
 })();
- 
+
 /* ══════════════════════════════════════════════════
-   DATA
+   DATA — 인기 관상어 20종 프리로드
 ══════════════════════════════════════════════════ */
 const FISH=[
-  {id:'0023',emoji:'🐠',koreanName:'흰동가리',englishName:'Clownfish',scientificName:'Amphiprion ocellaris',classification:'농어목 자리돔과',lifespan:'6–10년',maxSize:'11 cm',temperature:'24–28°C',ph:'8.1–8.4',minTank:'76 L',conservationStatus:'LC',difficulty:'초보자',waterType:'해수',price:'₩ 15,000~',habitat:'인도양 동부와 서태평양 전역에 분포. 인도네시아·필리핀·호주 북부 연안, 수심 1–15m 산호초 지대와 석호에 서식.',description:'주황색 바탕에 흰색 세 줄 무늬가 특징. 말미잘과 공생하며 독성에 면역인 점액층을 분비. 모든 개체는 수컷으로 태어나며 성전환하는 순차적 자웅동체.',tips:['최소 76L 해수 수조, 염도 1.020–1.025 유지','말미잘 없이도 사육·번식 가능','수컷끼리 합사 시 공격성 주의']},
-  {id:'0024',emoji:'🐟',koreanName:'레오파드 부시피시',englishName:'Leopard Bushfish',scientificName:'Ctenopoma acutirostre',classification:'농어목 아나반티다에과',lifespan:'10–15년',maxSize:'15–20 cm',temperature:'23–28°C',ph:'6.0–7.5',minTank:'150 L',conservationStatus:'LC',difficulty:'중급자',waterType:'담수',price:'₩ 35,000~',habitat:'콩고강 중류 유역 전역 분포. 수초가 빽빽한 느린 하천과 늪지대에서 미로기관으로 대기 중 산소를 직접 호흡.',description:'표범 무늬 반점 패턴을 가진 중형 담수어. 낙엽을 흉내 내는 위장 전략으로 매복 접근하는 포식자.',tips:['소형어와 합사 절대 금지','수면 부엽식물로 조도 낮추기','냉동 장구벌레·브라인쉬림프 급여 권장','점프 방지 뚜껑 필수']},
+  {id:'f001',emoji:'🐠',koreanName:'흰동가리',englishName:'Clownfish',scientificName:'Amphiprion ocellaris',classification:'농어목 자리돔과',lifespan:'6–10년',maxSize:'11 cm',temperature:'24–28°C',ph:'8.1–8.4',minTank:'76 L',conservationStatus:'LC',difficulty:'초보자',waterType:'해수',price:'₩ 15,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Clown_fish_in_the_Andaman_Coral_Reef.jpg/640px-Clown_fish_in_the_Andaman_Coral_Reef.jpg',habitat:'인도양 동부와 서태평양 전역에 분포. 수심 1–15m 산호초 지대와 석호에 서식.',description:'주황색 바탕에 흰색 세 줄 무늬가 특징. 말미잘과 공생하며 독성에 면역인 점액층을 분비. 순차적 자웅동체.',tips:['최소 76L 해수 수조, 염도 1.020–1.025 유지','말미잘 없이도 사육·번식 가능','수컷끼리 합사 시 공격성 주의']},
+  {id:'f002',emoji:'🐟',koreanName:'베타',englishName:'Betta',scientificName:'Betta splendens',classification:'농어목 구라미과',lifespan:'2–4년',maxSize:'7 cm',temperature:'24–30°C',ph:'6.0–7.5',minTank:'20 L',conservationStatus:'VU',difficulty:'초보자',waterType:'담수',price:'₩ 5,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Betta_fish_%28Betta_splendens%29.jpg/640px-Betta_fish_%28Betta_splendens%29.jpg',habitat:'태국·캄보디아·베트남의 논밭·연못·느린 하천에 서식.',description:'화려한 지느러미가 특징인 투어. 수컷끼리 합사 불가. 공기 호흡 가능한 미로기관 보유.',tips:['수컷 단독 사육 필수','히터로 수온 유지','주 1회 부분 환수 권장']},
+  {id:'f003',emoji:'🐡',koreanName:'금붕어',englishName:'Goldfish',scientificName:'Carassius auratus',classification:'잉어목 잉어과',lifespan:'10–15년',maxSize:'30 cm',temperature:'10–24°C',ph:'6.5–7.5',minTank:'80 L',conservationStatus:'LC',difficulty:'초보자',waterType:'담수',price:'₩ 2,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/GoldFishBowl.jpg/640px-GoldFishBowl.jpg',habitat:'중국 원산. 전 세계 냉수~온수 담수에서 사육. 정수된 연못·수조에 적합.',description:'수천 년 역사의 관상어. 다양한 품종 존재. 냉수성으로 히터 불필요. 수명이 매우 길어 책임감 필요.',tips:['여과기 필수 — 배설물이 많음','과식 주의, 하루 2회 소량 급여','히터 없이 실온 사육 가능']},
+  {id:'f004',emoji:'🐟',koreanName:'구피',englishName:'Guppy',scientificName:'Poecilia reticulata',classification:'동갈치목 포에킬리아과',lifespan:'2–3년',maxSize:'6 cm',temperature:'22–28°C',ph:'6.8–7.8',minTank:'40 L',conservationStatus:'LC',difficulty:'초보자',waterType:'담수',price:'₩ 2,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Guppy_-_Hugo_Claes.jpg/640px-Guppy_-_Hugo_Claes.jpg',habitat:'남미 베네수엘라·가이아나·트리니다드 원산. 느린 하천·연못에 서식.',description:'화려한 꼬리지느러미가 특징인 소형 담수어. 난태생으로 새끼를 직접 낳음. 번식력이 강해 주의 필요.',tips:['수컷과 암컷 비율 1:3 권장','번식 조절 위해 성별 분리 가능','초보자에게 가장 적합한 어종']},
+  {id:'f005',emoji:'🐠',koreanName:'디스커스',englishName:'Discus',scientificName:'Symphysodon discus',classification:'농어목 시클리드과',lifespan:'10–15년',maxSize:'20 cm',temperature:'28–31°C',ph:'6.0–7.0',minTank:'200 L',conservationStatus:'LC',difficulty:'고급자',waterType:'담수',price:'₩ 50,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Discus_Fish_%28Symphysodon_discus%29.jpg/640px-Discus_Fish_%28Symphysodon_discus%29.jpg',habitat:'아마존강 유역 블랙워터 지역. 수질이 매우 연하고 산성인 환경 선호.',description:'열대어의 왕으로 불리는 원형 체형의 화려한 어종. 수질 관리가 매우 까다로워 고급자용.',tips:['수온 28–31°C 엄격히 유지','주 3회 이상 부분 환수 필수','고단백 전용 사료 급여']},
+  {id:'f006',emoji:'🐟',koreanName:'아로와나',englishName:'Asian Arowana',scientificName:'Scleropages formosus',classification:'골설어목 골설어과',lifespan:'20년+',maxSize:'90 cm',temperature:'24–30°C',ph:'6.5–7.0',minTank:'1000 L',conservationStatus:'EN',difficulty:'고급자',waterType:'담수',price:'₩ 500,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Scleropages_formosus.jpg/640px-Scleropages_formosus.jpg',habitat:'동남아시아 열대 하천·호수·범람원에 서식. 인도네시아·말레이시아·태국 분포.',description:'용의 후손이라 불리는 대형 고급 관상어. CITES 1급 보호종으로 거래 시 서류 필수. 점프력이 강함.',tips:['최소 1000L 이상 대형 수조 필수','뚜껑 반드시 설치 — 점프 위험','CITES 허가 서류 확인 필수']},
+  {id:'f007',emoji:'🐠',koreanName:'엔젤피시',englishName:'Angelfish',scientificName:'Pterophyllum scalare',classification:'농어목 시클리드과',lifespan:'8–12년',maxSize:'15 cm',temperature:'24–30°C',ph:'6.0–7.5',minTank:'120 L',conservationStatus:'LC',difficulty:'중급자',waterType:'담수',price:'₩ 8,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Pterophyllum_scalare.jpg/640px-Pterophyllum_scalare.jpg',habitat:'아마존·오리노코강 유역 수초 지대. 느린 유속의 맑은 물을 선호.',description:'삼각형 체형과 긴 지느러미가 특징. 수초 어항에 어울리는 우아한 어종. 소형어 포식 가능.',tips:['높이 있는 수조 권장 (수직 유영)','소형어와 합사 주의','쌍으로 사육 시 번식 가능']},
+  {id:'f008',emoji:'🐟',koreanName:'코리도라스',englishName:'Corydoras',scientificName:'Corydoras paleatus',classification:'메기목 갑옷메기과',lifespan:'5–8년',maxSize:'7 cm',temperature:'22–26°C',ph:'6.0–7.5',minTank:'60 L',conservationStatus:'LC',difficulty:'초보자',waterType:'담수',price:'₩ 3,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Corydoras_paleatus.jpg/640px-Corydoras_paleatus.jpg',habitat:'남미 파라나강·라플라타강 유역. 모래·자갈 바닥의 느린 하천에 서식.',description:'바닥 청소부 역할을 하는 소형 갑옷메기. 온순한 성격으로 대부분의 어종과 합사 가능.',tips:['그룹(5마리+)으로 사육 권장','부드러운 모래 바닥재 필요','야행성 — 저녁에 먹이 급여']},
+  {id:'f009',emoji:'🐠',koreanName:'네온테트라',englishName:'Neon Tetra',scientificName:'Paracheirodon innesi',classification:'카라신목 카라신과',lifespan:'5–8년',maxSize:'4 cm',temperature:'20–26°C',ph:'6.0–7.0',minTank:'40 L',conservationStatus:'LC',difficulty:'초보자',waterType:'담수',price:'₩ 1,500~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Neontetras.jpg/640px-Neontetras.jpg',habitat:'아마존 상류 블랙워터 하천. 어두운 수초 지대에 무리 지어 서식.',description:'파란색과 빨간색 줄무늬가 형광처럼 빛나는 소형 어종. 무리 지어 유영하는 모습이 아름다움.',tips:['10마리 이상 그룹 사육 권장','조명 아래 색감이 가장 아름다움','산성 연수 환경 선호']},
+  {id:'f010',emoji:'🐡',koreanName:'오스카',englishName:'Oscar',scientificName:'Astronotus ocellatus',classification:'농어목 시클리드과',lifespan:'10–15년',maxSize:'35 cm',temperature:'23–28°C',ph:'6.0–8.0',minTank:'300 L',conservationStatus:'LC',difficulty:'중급자',waterType:'담수',price:'₩ 15,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Astronotus_ocellatus.jpg/640px-Astronotus_ocellatus.jpg',habitat:'아마존·오리노코강 유역. 느린 하천·홍수림 지역에 서식.',description:'강아지처럼 주인을 알아보는 영리한 대형 시클리드. 손에서 먹이를 받아먹을 정도로 친화적.',tips:['대형 여과기 필수 — 배설물 많음','소형어 즉시 포식 주의','혼자 또는 쌍으로 사육']},
+  {id:'f011',emoji:'🐠',koreanName:'탕가니카 시클리드',englishName:'Frontosa',scientificName:'Cyphotilapia frontosa',classification:'농어목 시클리드과',lifespan:'15–25년',maxSize:'35 cm',temperature:'24–26°C',ph:'7.8–9.0',minTank:'400 L',conservationStatus:'LC',difficulty:'중급자',waterType:'담수',price:'₩ 30,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Cyphotilapia_frontosa.jpg/640px-Cyphotilapia_frontosa.jpg',habitat:'아프리카 탕가니카 호수 깊은 곳. 수심 10–50m 암반 지대에 서식.',description:'이마의 혹이 특징적인 아프리카 대형 시클리드. 알칼리성 경수 환경 필수.',tips:['강알칼리성 수질(pH 8.0+) 유지','그룹 사육 권장','깊은 수조 필요']},
+  {id:'f012',emoji:'🐟',koreanName:'플래티',englishName:'Platy',scientificName:'Xiphophorus maculatus',classification:'동갈치목 포에킬리아과',lifespan:'3–4년',maxSize:'7 cm',temperature:'18–28°C',ph:'7.0–8.2',minTank:'40 L',conservationStatus:'LC',difficulty:'초보자',waterType:'담수',price:'₩ 2,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Xiphophorus_maculatus.jpg/640px-Xiphophorus_maculatus.jpg',habitat:'중앙아메리카 멕시코·과테말라 하천에 서식. 경수 환경 선호.',description:'다양한 색상 품종이 있는 소형 난태생 어종. 구피와 함께 초보자에게 가장 적합한 어종 중 하나.',tips:['경수(미네랄 풍부) 환경 선호','번식력 강함 — 성별 분리 고려','온순하여 합사 용이']},
+  {id:'f013',emoji:'🐠',koreanName:'화이트 클라우드 마운틴 미노우',englishName:'White Cloud Mountain Minnow',scientificName:'Tanichthys albonubes',classification:'잉어목 잉어과',lifespan:'3–5년',maxSize:'4 cm',temperature:'14–22°C',ph:'6.0–8.0',minTank:'30 L',conservationStatus:'EN',difficulty:'초보자',waterType:'담수',price:'₩ 2,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Tanichthys_albonubes.jpg/640px-Tanichthys_albonubes.jpg',habitat:'중국 광저우 백운산 계곡 원산. 차갑고 깨끗한 계류에 서식.',description:'냉수성 소형 어종으로 히터 불필요. 은빛 몸통에 붉은 지느러미가 아름다움.',tips:['히터 없이 실온(14–22°C) 사육 가능','그룹(6마리+) 사육 권장','야외 연못 사육도 가능']},
+  {id:'f014',emoji:'🐡',koreanName:'공작 시클리드',englishName:'Peacock Cichlid',scientificName:'Aulonocara nyassae',classification:'농어목 시클리드과',lifespan:'6–10년',maxSize:'15 cm',temperature:'26–28°C',ph:'7.8–8.5',minTank:'200 L',conservationStatus:'LC',difficulty:'중급자',waterType:'담수',price:'₩ 20,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Aulonocara_nyassae_male.jpg/640px-Aulonocara_nyassae_male.jpg',habitat:'아프리카 말라위 호수 바닥 모래 지대에 서식.',description:'수컷의 화려한 파란-노란 색상이 공작 깃털을 연상시키는 말라위 시클리드.',tips:['알칼리성 경수(pH 7.8+) 유지','수컷 1마리 + 암컷 여러 마리','암석 장식으로 영역 분리']},
+  {id:'f015',emoji:'🐟',koreanName:'세일핀 몰리',englishName:'Sailfin Molly',scientificName:'Poecilia latipinna',classification:'동갈치목 포에킬리아과',lifespan:'3–5년',maxSize:'12 cm',temperature:'22–28°C',ph:'7.0–8.5',minTank:'80 L',conservationStatus:'LC',difficulty:'초보자',waterType:'담수',price:'₩ 5,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Poecilia_latipinna.jpg/640px-Poecilia_latipinna.jpg',habitat:'북미 대서양 연안·멕시코만 기수역·담수에 서식.',description:'수컷의 큰 등지느러미가 돛처럼 펼쳐지는 것이 특징. 기수에도 적응 가능.',tips:['소금 약간 첨가 가능','번식력 강함','활발한 성격으로 넓은 공간 선호']},
 ];
- 
+
 function renderGrid(data){
   data=data||FISH;
   const g=document.getElementById('cgrid'),e=document.getElementById('emp');
@@ -446,13 +459,17 @@ function renderGrid(data){
   e.style.display='none';
   g.innerHTML=data.map((f,i)=>`
     <div class="ccard" style="animation-delay:${i*.07}s" onclick="openDetail('${f.id}')">
-      <div class="ce">${f.emoji}</div><div class="cn">${f.koreanName}</div>
+      ${f.picture
+        ? `<div style="width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;margin-bottom:10px;background:rgba(255,255,255,0.05)"><img src="${f.picture}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.display='none'"></div>`
+        : `<div class="ce">${f.emoji}</div>`
+      }
+      <div class="cn">${f.koreanName}</div>
       <div class="clat">${f.scientificName}</div>
       <div class="cbadge" style="border-color:${f.waterType==='해수'?'rgba(160,190,255,0.35)':'rgba(134,239,172,0.35)'};color:${f.waterType==='해수'?'rgba(160,190,255,0.85)':'rgba(134,239,172,0.85)'}">${f.waterType}</div>
       <div class="cprice">${f.price}</div>
     </div>`).join('');
 }
- 
+
 /* 타이핑 중 — 컬렉션 내 필터만 */
 function onSearchFilter(q){
   document.getElementById('sclear').style.display=q?'block':'none';
@@ -461,77 +478,94 @@ function onSearchFilter(q){
   document.getElementById('clbl').textContent='내 컬렉션';
   renderGrid(local.length?local:FISH);
 }
- 
-/* 엔터 — FishBase API 프록시로 검색 */
+
+/* 엔터 — iNaturalist API 검색 */
 async function searchFish(q){
   q=q.trim();if(!q)return;
   const lbl=document.getElementById('clbl');
   lbl.textContent='검색 중...';
-  document.getElementById('cgrid').innerHTML=`<div style="grid-column:span 2;padding:32px 0;text-align:center;font-size:13px;color:rgba(255,255,255,0.3);letter-spacing:.5px;">FishBase 검색 중...</div>`;
- 
+  document.getElementById('cgrid').innerHTML=`<div style="grid-column:span 2;padding:32px 0;text-align:center;font-size:13px;color:rgba(255,255,255,0.3);letter-spacing:.5px;">검색 중...</div>`;
+
   /* 로컬 컬렉션에 있으면 바로 표시 */
   const local=FISH.filter(f=>f.koreanName.includes(q)||f.englishName.toLowerCase().includes(q.toLowerCase())||f.scientificName.toLowerCase().includes(q.toLowerCase()));
   if(local.length){lbl.textContent='검색 결과';renderGrid(local);return;}
- 
+
   try{
     const res = await fetch(`/api/fish?q=${encodeURIComponent(q)}`);
     if(!res.ok) throw new Error('not found');
     const d = await res.json();
- 
-    const waterType = (d.habitat||'').toLowerCase().includes('marine')||
-                      (d.distribution||'').toLowerCase().includes('ocean') ? '해수' : '담수';
- 
+
+    const lw = (d.habitat||'').toLowerCase()+(d.description||'').toLowerCase();
+    const waterType = ['marine','ocean','coral','reef','saltwater','sea'].some(k=>lw.includes(k)) ? '해수'
+                    : ['freshwater','river','lake','stream','pond'].some(k=>lw.includes(k)) ? '담수'
+                    : '미확인';
+
+    /* 고유 id 생성 */
+    const newId = 'u_' + Date.now();
+
     const fish = {
-      id: String(Date.now()).slice(-4),
+      id: newId,
       emoji: '🐠',
       koreanName:  d.koreanName  || d.englishName || d.scientificName,
       englishName: d.englishName || '',
-      scientificName: d.scientificName,
-      classification: `${d.order||''} ${d.family||''}`.trim(),
+      scientificName: d.scientificName || q,
+      classification: d.classification || '-',
       lifespan:    d.lifespan    || '-',
-      maxSize:     d.maxLength   || '-',
+      maxSize:     d.maxSize     || '-',
       temperature: d.temperature || '-',
       ph:          d.ph          || '-',
-      minTank:     '-',
-      conservationStatus: d.iucn || 'LC',
-      difficulty:  '중급자',
+      minTank:     d.minTank     || '-',
+      conservationStatus: d.conservationStatus || 'LC',
+      difficulty:  d.difficulty  || '중급자',
       waterType,
       price: '시세 확인 중',
-      habitat:     d.distribution || d.habitat || '-',
-      description: d.habitat || '-',
-      picture:     d.picture || null,
-      tips:['현지 전문 판매점에 문의하세요.','수질 및 수온을 종에 맞게 유지해주세요.'],
+      habitat:     d.habitat     || '-',
+      description: d.description || '-',
+      picture:     d.picture     || null,
+      tips: d.tips || ['전문 판매점에 문의해 적정 수조 크기를 확인하세요.','수질 및 수온을 종에 맞게 유지해주세요.'],
     };
- 
+
     if(!FISH.find(x=>x.scientificName===fish.scientificName)) FISH.unshift(fish);
     lbl.textContent='검색 결과';
     renderGrid([fish]);
- 
+
   }catch(err){
     lbl.textContent='검색 결과 없음';
     document.getElementById('cgrid').innerHTML=`<div style="grid-column:span 2;padding:32px 0;text-align:center;font-size:13px;color:rgba(255,255,255,0.3);">"${q}" 결과를 찾지 못했어요</div>`;
   }
 }
- 
+
 function clearSearch(){
-  document.getElementById('sinput').value='';
   document.getElementById('sclear').style.display='none';
+  document.getElementById('sinput').value='';
   document.getElementById('clbl').textContent='내 컬렉션';
   renderGrid(FISH);
 }
- 
+
 function openDetail(id){
-  const f=FISH.find(x=>x.id===id);if(!f)return;
+  const f=FISH.find(x=>x.id===id);
+  if(!f)return;
   document.getElementById('dno').textContent='FISH MUSEUM · #'+f.id;
-  document.getElementById('demoji').textContent=f.emoji;
+  document.getElementById('demoji').textContent=f.picture?'':f.emoji;
+
+  /* 상세 이미지 */
+  const emojiEl = document.getElementById('demoji');
+  if(f.picture){
+    emojiEl.innerHTML=`<img src="${f.picture}" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-bottom:8px" onerror="this.outerHTML='${f.emoji}'">`;
+  } else {
+    emojiEl.textContent=f.emoji;
+  }
+
   document.getElementById('dname').textContent=f.koreanName;
   document.getElementById('dlatin').textContent=f.scientificName;
   document.getElementById('dprice').textContent=f.price;
   document.getElementById('dhab').textContent=f.habitat;
   document.getElementById('ddesc').textContent=f.description;
   document.getElementById('dbadges').innerHTML=[
-    `<span class="b">${f.englishName}</span>`,`<span class="b">${f.classification}</span>`,
-    `<span class="b g">IUCN ${f.conservationStatus}</span>`,`<span class="b a">${f.waterType}</span>`,
+    `<span class="b">${f.englishName||'-'}</span>`,
+    `<span class="b">${f.classification||'-'}</span>`,
+    `<span class="b g">IUCN ${f.conservationStatus||'LC'}</span>`,
+    `<span class="b a">${f.waterType||'-'}</span>`,
   ].join('');
   document.getElementById('dinfo').innerHTML=[
     ['수명',f.lifespan],['최대 크기',f.maxSize],['수온',f.temperature],
@@ -540,10 +574,10 @@ function openDetail(id){
   document.getElementById('dtips').innerHTML=(f.tips||[]).map(t=>`<div class="trow"><div class="tdot"></div><div class="ttxt">${t}</div></div>`).join('');
   showScreen('detail');
 }
- 
+
 function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+n).classList.add('active')}
 function setNav(el){document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));el.classList.add('active')}
- 
+
 let b64=null,btype=null;
 document.getElementById('fi').addEventListener('change',e=>{
   const file=e.target.files[0];if(!file)return;
@@ -560,7 +594,7 @@ document.getElementById('fi').addEventListener('change',e=>{
   };
   r.readAsDataURL(file);
 });
- 
+
 async function scanFish(){
   if(!b64)return;
   const btn=document.getElementById('sbt');
@@ -615,7 +649,7 @@ function resetScan(){
   document.getElementById('ss').textContent='Ready';
   document.getElementById('fi').value='';
 }
- 
+
 renderGrid();
 </script>
 </body>
