@@ -458,7 +458,7 @@ function renderGrid(data){
   if(!data.length){g.innerHTML='';e.style.display='block';return}
   e.style.display='none';
   g.innerHTML=data.map((f,i)=>`
-    <div class="ccard" style="animation-delay:${i*.07}s" onclick="openDetail('${f.id}')">
+    <div class="ccard" style="animation-delay:${i*.07}s" data-id="${f.id}">
       ${f.picture
         ? `<div style="width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;margin-bottom:10px;background:rgba(255,255,255,0.05)"><img src="${f.picture}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.display='none'"></div>`
         : `<div class="ce">${f.emoji}</div>`
@@ -468,6 +468,11 @@ function renderGrid(data){
       <div class="cbadge" style="border-color:${f.waterType==='해수'?'rgba(160,190,255,0.35)':'rgba(134,239,172,0.35)'};color:${f.waterType==='해수'?'rgba(160,190,255,0.85)':'rgba(134,239,172,0.85)'}">${f.waterType}</div>
       <div class="cprice">${f.price}</div>
     </div>`).join('');
+
+  /* 카드 클릭 이벤트 — data-id로 안전하게 */
+  g.querySelectorAll('.ccard').forEach(card=>{
+    card.addEventListener('click',()=>openDetail(card.dataset.id));
+  });
 }
 
 /* 타이핑 중 — 컬렉션 내 필터만 */
