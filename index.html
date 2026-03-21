@@ -6,317 +6,367 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fish Museum">
-<meta name="theme-color" content="#e8f4ff">
+<meta name="theme-color" content="#6ab0e8">
 <link rel="manifest" href="manifest.json">
 <title>Fish Museum</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:#e8f4ff;font-family:'Inter',sans-serif;color:#1a2a4a}
-#app{position:relative;width:100%;max-width:430px;margin:0 auto;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+html,body{height:100%;overflow:hidden;font-family:"DM Sans",sans-serif}
+#app{position:relative;width:100%;max-width:430px;margin:0 auto;height:100dvh;overflow:hidden}
 
-/* ─── BG ─── */
-.bg{position:absolute;inset:0;z-index:0;background:#e8f4ff}
-#cv{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
-.bg-fade{
-  position:absolute;inset:0;
-  background:linear-gradient(to bottom,
-    transparent 0%,
-    transparent 45%,
-    rgba(232,244,255,0.6) 62%,
-    rgba(232,244,255,0.95) 78%,
-    #e8f4ff 90%
-  );
-  pointer-events:none;
+/* ════ BACKGROUND
+   레퍼런스 그대로: 좌상 하늘파랑 → 우하 연보라핑크
+   전체 화면을 단일 그라데이션으로 덮음 — 끊김 없음
+════ */
+.bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 120% 80% at 10% 5%,  #5ba3e2 0%, transparent 55%),
+    radial-gradient(ellipse 100% 70% at 90% 10%,  #88b8ea 0%, transparent 50%),
+    radial-gradient(ellipse 80%  60% at 50% 40%,  #b8c8e8 0%, transparent 55%),
+    radial-gradient(ellipse 100% 80% at 80% 80%,  #d4b8d8 0%, transparent 55%),
+    radial-gradient(ellipse 120% 60% at 20% 90%,  #e0c0d8 0%, transparent 55%),
+    linear-gradient(150deg, #6ab0e8 0%, #96c4ee 25%, #b8d4f0 45%, #ccc8e8 65%, #dcc0dc 85%, #e8c4d8 100%);
 }
+/* Aurora 숨결 — 색 위에 은은하게 */
+#cv{position:absolute;top:0;left:0;width:100%;height:100%;display:block;mix-blend-mode:soft-light;opacity:.5}
 
-/* ─── SCREENS ─── */
-.screen{display:none;flex-direction:column;flex:1;overflow:hidden;position:relative;z-index:1}
-.screen.active{display:flex}
-.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:100px}
-.scroll::-webkit-scrollbar{display:none}
+/* ════ SCREENS ════ */
+.screen{display:none;position:absolute;inset:0;z-index:1}
+.screen.active{display:flex;flex-direction:column}
 
-/* ─── TOP BAR ─── */
-.topbar{padding:54px 22px 0;display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:0}
-.avatar{
+/* ════ HOME ════ */
+/* 상단 투명 영역 — 그라데이션 그대로 보임 */
+.home-top{
+  flex-shrink:0;
+  padding:56px 28px 0;
+}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.tag-today{
+  padding:6px 16px;background:rgba(255,255,255,0.85);
+  border-radius:99px;font-size:11px;font-weight:700;
+  color:#1e3a8a;letter-spacing:.3px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 2px 12px rgba(30,58,138,0.1);
+}
+.avatar-btn{
   width:36px;height:36px;border-radius:50%;
-  background:rgba(255,255,255,0.55);
-  border:1px solid rgba(255,255,255,0.8);
+  background:rgba(255,255,255,0.3);
+  border:1.5px solid rgba(255,255,255,0.6);
   display:flex;align-items:center;justify-content:center;cursor:pointer;
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  box-shadow:0 2px 8px rgba(80,130,220,0.12);
+  backdrop-filter:blur(12px);
 }
-.avatar svg{width:16px;height:16px;stroke:#4a7abd;fill:none;stroke-width:1.8}
+.avatar-btn svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:1.8}
 
-/* ─── HERO ─── */
-.hero{padding:24px 22px 0}
-.hero-sm{font-size:13px;color:rgba(80,110,170,0.7);margin-bottom:6px;font-weight:400;letter-spacing:.2px}
-.hero-lg{font-size:36px;font-weight:600;line-height:1.1;letter-spacing:-1.5px;color:#1a2a4a}
-.hero-lg em{font-style:normal;color:#3b82f6}
+/* 큰 흰 타이틀 */
+.hero-title{
+  font-family:"DM Serif Display",serif;
+  font-size:52px;font-weight:400;
+  line-height:1.0;letter-spacing:-1.5px;
+  color:#fff;
+  text-shadow:0 2px 24px rgba(30,58,138,0.2);
+  margin-bottom:8px;
+}
+.hero-title em{font-style:italic;color:rgba(255,255,255,0.75)}
+.hero-sub{
+  font-size:13px;font-weight:400;
+  color:rgba(255,255,255,0.65);
+  letter-spacing:.3px;
+  margin-bottom:0;
+}
 
-/* ─── SEARCH ─── */
-.sw{padding:18px 22px 0}
+/* ════ BOTTOM SHEET
+   그라데이션 위에 자연스럽게 올라오는 흰 카드
+   둥근 모서리로 그라데이션이 살짝 보임
+════ */
+.bottom-sheet{
+  flex:1;
+  background:#fff;
+  border-radius:28px 28px 0 0;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  margin-top:28px;
+  box-shadow:0 -4px 40px rgba(30,58,138,0.12);
+}
+
+/* 시트 안 검색 헤더 — 흰 배경, 그라데이션과 자연스럽게 연결 */
+.sheet-top{
+  padding:20px 24px 16px;
+  flex-shrink:0;
+  border-bottom:1px solid rgba(30,58,138,0.06);
+}
 .sbox{
-  display:flex;align-items:center;gap:10px;
-  background:rgba(255,255,255,0.65);
-  border:1px solid rgba(255,255,255,0.9);
-  border-radius:16px;padding:13px 16px;
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  box-shadow:0 2px 12px rgba(80,130,220,0.08);
+  display:flex;align-items:center;gap:12px;
+  background:#f4f7ff;
+  border:1.5px solid rgba(30,58,138,0.08);
+  border-radius:16px;padding:14px 18px;
 }
-.sbox svg{flex-shrink:0;width:15px;height:15px;stroke:rgba(80,120,200,0.4);fill:none;stroke-width:2}
-.sinput{flex:1;background:none;border:none;outline:none;font-family:'Inter',sans-serif;font-size:14px;color:#1a2a4a}
-.sinput::placeholder{color:rgba(80,120,180,0.35)}
-.sclear{background:none;border:none;color:rgba(80,120,180,0.4);font-size:20px;cursor:pointer;display:none;line-height:1;padding:0}
+.sbox svg{flex-shrink:0;width:16px;height:16px;stroke:rgba(30,58,138,0.3);fill:none;stroke-width:2}
+.sinput{flex:1;background:none;border:none;outline:none;font-family:"DM Sans",sans-serif;font-size:15px;color:#0d1b3e}
+.sinput::placeholder{color:rgba(30,58,138,0.28)}
+.sclear{background:none;border:none;color:rgba(30,58,138,0.3);font-size:22px;cursor:pointer;display:none;line-height:1;padding:0}
 
-/* ─── SCANNER ─── */
-.scnw{padding:14px 22px 0}
+/* 스크롤 영역 */
+.sheet-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:90px}
+.sheet-scroll::-webkit-scrollbar{display:none}
+
+/* ════ SCANNER ════ */
+.scnw{padding:20px 24px 0}
 .scnf{
-  border:1px solid rgba(255,255,255,0.85);
+  border:1.5px solid rgba(30,58,138,0.08);
   border-radius:20px;overflow:hidden;
-  background:rgba(255,255,255,0.45);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  box-shadow:0 4px 24px rgba(80,130,220,0.10);
+  background:#f8faff;
 }
 .scnv{position:relative;width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
 .scnv img#prev{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
-.scni{display:flex;flex-direction:column;align-items:center;gap:10px;z-index:1}
+.scni{display:flex;flex-direction:column;align-items:center;gap:12px;z-index:1}
 .scnr{
   width:52px;height:52px;border-radius:50%;
-  background:rgba(255,255,255,0.7);
-  border:1.5px solid rgba(100,160,255,0.3);
+  background:#fff;
+  border:1.5px solid rgba(30,58,138,0.1);
   display:flex;align-items:center;justify-content:center;
-  backdrop-filter:blur(8px);
+  box-shadow:0 4px 16px rgba(30,58,138,0.1);
 }
-.scnr svg{width:20px;height:20px;stroke:#3b82f6;fill:none;stroke-width:1.5}
-.scnlbl{font-size:13px;font-weight:500;color:rgba(40,70,140,0.6)}
-.scnsub{font-size:11px;color:rgba(80,120,180,0.35);letter-spacing:.3px}
-.corner{position:absolute;width:15px;height:15px}
-.corner.tl{top:11px;left:11px;border-top:1.5px solid rgba(59,130,246,0.5);border-left:1.5px solid rgba(59,130,246,0.5);border-radius:3px 0 0 0}
-.corner.tr{top:11px;right:11px;border-top:1.5px solid rgba(59,130,246,0.5);border-right:1.5px solid rgba(59,130,246,0.5);border-radius:0 3px 0 0}
-.corner.bl{bottom:11px;left:11px;border-bottom:1.5px solid rgba(59,130,246,0.5);border-left:1.5px solid rgba(59,130,246,0.5);border-radius:0 0 0 3px}
-.corner.br{bottom:11px;right:11px;border-bottom:1.5px solid rgba(59,130,246,0.5);border-right:1.5px solid rgba(59,130,246,0.5);border-radius:0 0 3px 0}
-.sline{position:absolute;left:0;right:0;height:1.5px;background:linear-gradient(to right,transparent,rgba(59,130,246,0.7),transparent);animation:scanm 2.4s ease-in-out infinite;display:none;z-index:3}
+.scnr svg{width:20px;height:20px;stroke:#1e3a8a;fill:none;stroke-width:1.5}
+.scnlbl{font-size:14px;font-weight:500;color:rgba(30,58,138,0.5)}
+.scnsub{font-size:11px;color:rgba(30,58,138,0.25);letter-spacing:.3px}
+.corner{position:absolute;width:16px;height:16px}
+.corner.tl{top:12px;left:12px;border-top:2px solid rgba(30,58,138,0.25);border-left:2px solid rgba(30,58,138,0.25);border-radius:4px 0 0 0}
+.corner.tr{top:12px;right:12px;border-top:2px solid rgba(30,58,138,0.25);border-right:2px solid rgba(30,58,138,0.25);border-radius:0 4px 0 0}
+.corner.bl{bottom:12px;left:12px;border-bottom:2px solid rgba(30,58,138,0.25);border-left:2px solid rgba(30,58,138,0.25);border-radius:0 0 0 4px}
+.corner.br{bottom:12px;right:12px;border-bottom:2px solid rgba(30,58,138,0.25);border-right:2px solid rgba(30,58,138,0.25);border-radius:0 0 4px 0}
+.sline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,rgba(30,58,138,0.4),transparent);animation:scanm 2.4s ease-in-out infinite;display:none;z-index:3}
 @keyframes scanm{0%{top:10%}50%{top:86%}100%{top:10%}}
-.scnft{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;border-top:1px solid rgba(100,160,255,0.1)}
-.sstat{font-size:10px;font-weight:500;letter-spacing:1px;color:rgba(59,130,246,0.5);text-transform:uppercase}
-.sbtn{padding:7px 18px;background:#3b82f6;color:#fff;border:none;border-radius:99px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;display:none;box-shadow:0 2px 8px rgba(59,130,246,0.3)}
+.scnft{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid rgba(30,58,138,0.06)}
+.sstat{font-size:10px;font-weight:600;letter-spacing:1.2px;color:rgba(30,58,138,0.28);text-transform:uppercase}
+.sbtn{padding:8px 20px;background:#1e3a8a;color:#fff;border:none;border-radius:99px;font-family:"DM Sans",sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:none;letter-spacing:.3px}
 .sbtn:disabled{opacity:.35}
-.errmsg{margin:8px 22px 0;font-size:13px;color:rgba(220,60,60,0.8);display:none}
+.errmsg{margin:10px 24px 0;font-size:13px;color:rgba(180,30,30,0.8);display:none}
 
-/* ─── CTA ─── */
-.ctaw{padding:12px 22px 0}
-.ctab{
-  width:100%;display:flex;align-items:center;gap:14px;
-  background:rgba(255,255,255,0.55);
-  border:1px solid rgba(255,255,255,0.9);
-  border-radius:18px;padding:14px 18px;cursor:pointer;
-  position:relative;overflow:hidden;
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  box-shadow:0 4px 16px rgba(80,130,220,0.10);
-}
-.ctab::before{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.4),transparent);transform:translateX(-100%);animation:sh 3s ease-in-out infinite}
-@keyframes sh{to{transform:translateX(200%)}}
-.ctai{width:38px;height:38px;border-radius:50%;background:rgba(59,130,246,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ctai svg{width:16px;height:16px;stroke:#3b82f6;fill:none;stroke-width:2}
-.ctam{font-size:14px;font-weight:500;color:#1a2a4a;letter-spacing:-.2px}
-.ctasb{font-size:11px;color:rgba(80,120,180,0.5);margin-top:1px}
-.ctarr{margin-left:auto;color:rgba(80,120,180,0.35);font-size:18px}
+/* ════ RESULT ════ */
+.rsec{padding:20px 24px 0;display:none}
+.rname{font-family:"DM Serif Display",serif;font-size:26px;color:#0d1b3e;letter-spacing:-.5px}
+.rlat{font-size:13px;color:#1e3a8a;font-style:italic;margin-top:4px;opacity:.55}
+.rconf{display:inline-block;margin-top:10px;padding:4px 12px;background:#eff6ff;border:1px solid rgba(30,58,138,0.12);border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.6px;color:#1e3a8a}
 
-/* ─── RESULT ─── */
-.rsec{padding:14px 22px 0;display:none}
-.rname{font-size:22px;font-weight:600;color:#1a2a4a;letter-spacing:-.4px}
-.rlat{font-size:12px;color:#3b82f6;font-style:italic;margin-top:3px}
-.rconf{display:inline-block;margin-top:8px;padding:3px 10px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:99px;font-size:10px;font-weight:500;letter-spacing:.5px;color:#3b82f6}
+/* ════ SECTION LABEL ════ */
+.sec{font-size:10px;font-weight:700;letter-spacing:3px;color:rgba(30,58,138,0.25);text-transform:uppercase;padding:20px 24px 10px}
 
-/* ─── LABELS ─── */
-.sec{font-size:10px;font-weight:600;letter-spacing:2px;color:rgba(80,110,170,0.45);text-transform:uppercase;padding:16px 22px 10px}
+/* ════ CHIPS ════ */
+.igrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0 24px}
+.chip{background:#f4f7ff;border:1px solid rgba(30,58,138,0.07);border-radius:16px;padding:14px 10px;text-align:center}
+.clbl{font-size:9px;font-weight:700;letter-spacing:1.8px;color:rgba(30,58,138,0.28);text-transform:uppercase;margin-bottom:6px}
+.cval{font-size:13px;font-weight:600;color:#0d1b3e;line-height:1.3}
 
-/* ─── CHIPS ─── */
-.igrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:0 22px}
-.chip{background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.9);border-radius:14px;padding:12px 8px;text-align:center;backdrop-filter:blur(12px);box-shadow:0 2px 8px rgba(80,130,220,0.06)}
-.clbl{font-size:9px;font-weight:600;letter-spacing:1.5px;color:rgba(80,110,170,0.4);text-transform:uppercase;margin-bottom:5px}
-.cval{font-size:12px;font-weight:500;color:#1a2a4a;line-height:1.3}
-
-/* ─── BOXES ─── */
-.box{margin:0 22px;background:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.9);border-radius:16px;padding:14px;backdrop-filter:blur(12px);box-shadow:0 2px 8px rgba(80,130,220,0.06)}
-.boxt{font-size:13px;color:rgba(40,70,140,0.65);line-height:1.8}
-.plain{padding:0 22px;font-size:13px;color:rgba(40,70,140,0.65);line-height:1.8}
-.divl{height:1px;background:rgba(100,150,230,0.1);margin:16px 22px}
-.trow{display:flex;gap:10px;align-items:flex-start;padding:8px 22px;border-bottom:1px solid rgba(100,150,230,0.07)}
+/* ════ BOXES ════ */
+.box{margin:0 24px;background:#f4f7ff;border:1px solid rgba(30,58,138,0.07);border-radius:16px;padding:16px}
+.boxt{font-size:14px;color:rgba(13,27,62,0.55);line-height:1.85}
+.plain{padding:0 24px;font-size:14px;color:rgba(13,27,62,0.55);line-height:1.85}
+.divl{height:1px;background:rgba(30,58,138,0.06);margin:18px 24px}
+.trow{display:flex;gap:12px;align-items:flex-start;padding:8px 24px;border-bottom:1px solid rgba(30,58,138,0.04)}
 .trow:last-child{border-bottom:none}
-.tdot{width:5px;height:5px;border-radius:50%;background:#3b82f6;margin-top:7px;opacity:.4;flex-shrink:0}
-.ttxt{font-size:13px;color:rgba(40,70,140,0.65);line-height:1.7;flex:1}
-.ghost{display:block;width:calc(100% - 44px);margin:14px 22px 0;padding:12px;background:rgba(255,255,255,0.5);border:1.5px solid rgba(59,130,246,0.2);border-radius:99px;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;letter-spacing:1.5px;color:#3b82f6;cursor:pointer;text-align:center;text-transform:uppercase;backdrop-filter:blur(8px)}
+.tdot{width:6px;height:6px;border-radius:50%;background:#f59e0b;margin-top:8px;flex-shrink:0}
+.ttxt{font-size:14px;color:rgba(13,27,62,0.55);line-height:1.7;flex:1}
+.ghost{display:block;width:calc(100% - 48px);margin:16px 24px 0;padding:13px;background:none;border:1.5px solid rgba(30,58,138,0.12);border-radius:99px;font-family:"DM Sans",sans-serif;font-size:11px;font-weight:700;letter-spacing:1.8px;color:#1e3a8a;cursor:pointer;text-align:center;text-transform:uppercase}
 
-/* ─── COLLECTION ─── */
-.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 22px}
+/* ════ COLLECTION ════ */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 24px}
 .ccard{
-  background:rgba(255,255,255,0.60);
-  border:1px solid rgba(255,255,255,0.92);
-  border-radius:20px;padding:16px;cursor:pointer;
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  box-shadow:0 4px 16px rgba(80,130,220,0.08);
+  background:#fff;
+  border:1.5px solid rgba(30,58,138,0.08);
+  border-radius:22px;
+  overflow:hidden;
+  cursor:pointer;
+  box-shadow:0 4px 20px rgba(30,58,138,0.07);
   animation:fu .4s ease both;
+  transition:transform .18s,box-shadow .18s;
 }
-.ccard:active{background:rgba(255,255,255,0.8)}
-@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.ce{font-size:28px;margin-bottom:10px}
-.cn{font-size:14px;font-weight:500;color:#1a2a4a;letter-spacing:-.2px}
-.clat{font-size:10px;color:rgba(80,110,170,0.4);font-style:italic;margin-top:2px}
-.cbadge{display:inline-block;margin-top:8px;padding:3px 9px;border:1px solid;border-radius:99px;font-size:9px;font-weight:600;letter-spacing:.5px}
-.cprice{font-size:13px;font-weight:500;color:#3b82f6;margin-top:6px}
-.empty{padding:48px 22px;text-align:center}
-.empty-i{font-size:30px;opacity:.2;margin-bottom:10px}
-.empty-t{font-size:10px;font-weight:600;letter-spacing:2.5px;color:rgba(80,110,170,0.3);text-transform:uppercase}
+.ccard:active{transform:scale(.96);box-shadow:0 2px 8px rgba(30,58,138,0.07)}
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+/* 카드 사진 영역 */
+.cimg{
+  width:100%;aspect-ratio:4/3;
+  background:linear-gradient(135deg,#e8f2fb,#ddd0ec);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  font-size:32px;
+}
+.cimg img{width:100%;height:100%;object-fit:cover}
+/* 카드 텍스트 영역 */
+.ctxt{padding:12px 14px 14px}
+.cn{font-size:13px;font-weight:700;color:#0d1b3e;letter-spacing:-.2px;line-height:1.3}
+.clat{font-size:9px;color:rgba(30,58,138,0.3);font-style:italic;margin-top:3px}
+.cbadge{display:inline-block;margin-top:8px;padding:3px 9px;border-radius:99px;font-size:9px;font-weight:700;letter-spacing:.4px}
+.cbadge-sea{background:#eff6ff;color:#1e40af;border:1px solid rgba(30,64,175,0.12)}
+.cbadge-fw {background:#f0fdf4;color:#166534;border:1px solid rgba(22,101,52,0.12)}
+.empty{padding:48px 24px;text-align:center}
+.empty-i{font-size:32px;opacity:.2;margin-bottom:10px}
+.empty-t{font-size:10px;font-weight:700;letter-spacing:2.5px;color:rgba(30,58,138,0.18);text-transform:uppercase}
 
-/* ─── DETAIL ─── */
-.backrow{padding:54px 22px 8px;display:flex;align-items:center;gap:8px;cursor:pointer}
-.backrow svg{width:18px;height:18px;stroke:rgba(80,120,180,0.5);fill:none;stroke-width:2}
-.backlbl{font-size:11px;font-weight:500;letter-spacing:1.5px;color:rgba(80,120,180,0.5);text-transform:uppercase}
-.dhero{padding:20px 22px 22px;text-align:center;border-bottom:1px solid rgba(100,150,230,0.1)}
-.dno{font-size:9px;font-weight:600;letter-spacing:3px;color:rgba(80,110,170,0.3);text-transform:uppercase;margin-bottom:4px}
-.demoji{font-size:52px;margin:8px 0}
-.dname{font-size:26px;font-weight:600;color:#1a2a4a;letter-spacing:-.5px}
-.dlatin{font-size:12px;color:#3b82f6;font-style:italic;margin-top:4px}
-.brow{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;justify-content:center}
-.b{padding:3px 10px;background:rgba(255,255,255,0.6);border:1px solid rgba(100,150,230,0.2);border-radius:99px;font-size:10px;font-weight:500;color:rgba(60,90,160,0.7);backdrop-filter:blur(8px)}
-.b.g{background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.25);color:rgba(22,163,74,0.9)}
-.b.a{background:rgba(251,191,36,0.08);border-color:rgba(251,191,36,0.25);color:rgba(180,130,0,0.9)}
-
-.buybar{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-top:1px solid rgba(100,150,230,0.1);background:rgba(232,244,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding-bottom:calc(14px + env(safe-area-inset-bottom))}
-.plbl{font-size:10px;font-weight:600;color:rgba(80,110,170,0.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
-.pval{font-size:22px;font-weight:600;color:#3b82f6;letter-spacing:-.5px}
-.buybtn{padding:11px 24px;background:#3b82f6;color:#fff;border:none;border-radius:99px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(59,130,246,0.35)}
-
-/* ─── BOTTOM NAV ─── */
+/* ════ BOTTOM NAV ════ */
 .bnav{
-  position:absolute;bottom:0;left:0;right:0;display:flex;
-  border-top:1px solid rgba(100,150,230,0.1);
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  background:#fff;
+  border-top:1px solid rgba(30,58,138,0.07);
   padding-bottom:env(safe-area-inset-bottom);
-  background:rgba(232,244,255,0.88);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  z-index:10;
+  display:flex;align-items:center;
+  z-index:20;
+  box-shadow:0 -2px 20px rgba(30,58,138,0.07);
 }
-.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;cursor:pointer}
-.ni svg{width:19px;height:19px;stroke:rgba(80,120,180,0.28);fill:none;stroke-width:1.5}
-.ni.active svg{stroke:#3b82f6}
-.nil{font-size:9px;font-weight:600;letter-spacing:1px;color:rgba(80,120,180,0.28);text-transform:uppercase}
-.ni.active .nil{color:#3b82f6}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 0;cursor:pointer}
+.ni svg{width:20px;height:20px;stroke:rgba(30,58,138,0.2);fill:none;stroke-width:1.5}
+.ni.active svg{stroke:#1e3a8a}
+.nil{font-size:8px;font-weight:700;letter-spacing:.8px;color:rgba(30,58,138,0.2);text-transform:uppercase}
+.ni.active .nil{color:#1e3a8a}
+.ni-scan{
+  width:54px;height:54px;border-radius:50%;
+  background:#1e3a8a;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:-22px;
+  box-shadow:0 6px 20px rgba(30,58,138,0.38);
+  cursor:pointer;flex-shrink:0;
+  border:3.5px solid #fff;
+}
+.ni-scan svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2}
+
+/* ════ DETAIL ════ */
+#screen-detail{background:#f5f8ff;overflow:hidden}
+.dscroll{height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:100px}
+.dscroll::-webkit-scrollbar{display:none}
+/* 디테일 상단 그라데이션 헤더 */
+.dback-area{
+  background:linear-gradient(150deg,#6ab0e8 0%,#9ec8ee 35%,#ccc8e8 70%,#dcc0dc 100%);
+  padding:56px 24px 28px;
+}
+.backrow{display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:20px}
+.backrow svg{width:18px;height:18px;stroke:rgba(255,255,255,0.8);fill:none;stroke-width:2.2}
+.backlbl{font-size:11px;font-weight:700;letter-spacing:1.8px;color:rgba(255,255,255,0.7);text-transform:uppercase}
+.dhero-inner{text-align:center}
+.dno{font-size:9px;font-weight:700;letter-spacing:3px;color:rgba(255,255,255,0.45);text-transform:uppercase;margin-bottom:8px}
+.demoji{margin-bottom:12px}
+.dname{font-family:"DM Serif Display",serif;font-size:32px;color:#fff;letter-spacing:-.8px;text-shadow:0 2px 16px rgba(30,58,138,0.2)}
+.dlatin{font-size:13px;color:rgba(255,255,255,0.6);font-style:italic;margin-top:6px}
+.brow{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;justify-content:center}
+.b{padding:4px 12px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:99px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.9);backdrop-filter:blur(8px)}
+.b.g{background:rgba(134,239,172,0.2);border-color:rgba(134,239,172,0.4);color:rgba(220,255,230,0.95)}
+.b.a{background:rgba(253,224,71,0.2);border-color:rgba(253,224,71,0.4);color:rgba(255,248,200,0.95)}
+
+/* 디테일 흰 카드 영역 */
+.d-white{background:#fff;border-radius:24px 24px 0 0;margin-top:-20px;padding-bottom:20px}
+#screen-detail .sec{color:rgba(30,58,138,0.25);padding:20px 24px 10px}
+#screen-detail .igrid{padding:0 24px}
+#screen-detail .box{margin:0 24px}
+#screen-detail .plain{padding:0 24px}
+#screen-detail .trow{padding:8px 24px}
+#screen-detail .divl{margin:18px 24px}
 </style>
 </head>
 <body>
 <div id="app">
-  <div class="bg">
-    <canvas id="cv"></canvas>
-    <div class="bg-fade"></div>
-  </div>
+  <div class="bg"><canvas id="cv"></canvas></div>
 
-  <!-- HOME -->
+  <!-- ════ HOME ════ -->
   <div class="screen active" id="screen-home">
-    <div class="scroll">
+    <div class="home-top">
       <div class="topbar">
-        <div class="logo">
-          <svg width="148" height="34" viewBox="0 0 148 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 26 C4 26 4 8 11 8 C18 8 18 26 18 26" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" fill="none"/>
-            <path d="M18 26 C18 26 18 8 25 8 C32 8 32 26 32 26" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" fill="none"/>
-            <path d="M32 26 C32 26 32 8 39 8 C46 8 46 26 46 26" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" fill="none"/>
-            <circle cx="50" cy="26" r="2.5" fill="#60a5fa"/>
-            <text x="58" y="20" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="#1a2a4a" letter-spacing="1.5">FISH</text>
-            <text x="58" y="32" font-family="Inter,sans-serif" font-size="9" font-weight="400" fill="rgba(80,110,170,0.45)" letter-spacing="3">MUSEUM</text>
-          </svg>
-        </div>
-        <div class="avatar">
+        <div class="tag-today">Today</div>
+        <div class="avatar-btn">
           <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
       </div>
+      <div class="hero-title">Fish<br><em>Museum.</em></div>
+      <div class="hero-sub">세계 어류 도감 &amp; 스캐너</div>
+    </div>
 
-      <div class="hero">
-        <div class="hero-sm">안녕하세요 👋</div>
-        <div class="hero-lg">Discover the<br>world <em>beneath</em><br>the surface</div>
-      </div>
-
-      <div class="sw">
+    <!-- 흰 시트 -->
+    <div class="bottom-sheet">
+      <div class="sheet-top">
         <div class="sbox">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input class="sinput" id="sinput" type="text" placeholder="물고기 이름 검색 후 엔터..." autocomplete="off" oninput="onSearchFilter(this.value)" onkeydown="if(event.key==='Enter')searchFish(this.value)">
+          <input class="sinput" id="sinput" type="text"
+            placeholder="물고기 이름 검색 후 엔터..."
+            autocomplete="off"
+            oninput="onSearchFilter(this.value)"
+            onkeydown="if(event.key===&#39;Enter&#39;)searchFish(this.value)">
           <button class="sclear" id="sclear" onclick="clearSearch()">×</button>
         </div>
       </div>
 
-      <div class="scnw">
-        <div class="scnf">
-          <div class="scnv" id="sv" onclick="document.getElementById('fi').click()">
-            <img id="prev">
-            <div class="scni" id="idle">
-              <div class="scnr"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-              <div class="scnlbl">물고기 사진 업로드</div>
-              <div class="scnsub">Tap to identify a fish</div>
+      <div class="sheet-scroll">
+        <!-- 스캐너 -->
+        <div class="scnw">
+          <div class="scnf">
+            <div class="scnv" id="sv" onclick="document.getElementById(&#39;fi&#39;).click()">
+              <img id="prev">
+              <div class="scni" id="idle">
+                <div class="scnr">
+                  <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+                <div class="scnlbl">사진으로 어류 종 인식</div>
+                <div class="scnsub">Tap to identify</div>
+              </div>
+              <div class="corner tl"></div><div class="corner tr"></div>
+              <div class="corner bl"></div><div class="corner br"></div>
+              <div class="sline" id="sl"></div>
             </div>
-            <div class="corner tl"></div><div class="corner tr"></div>
-            <div class="corner bl"></div><div class="corner br"></div>
-            <div class="sline" id="sl"></div>
+            <div class="scnft">
+              <span class="sstat" id="ss">Ready</span>
+              <button class="sbtn" id="sbt" onclick="event.stopPropagation();scanFish()">Identify</button>
+            </div>
           </div>
-          <div class="scnft">
-            <span class="sstat" id="ss">Ready</span>
-            <button class="sbtn" id="sbt" onclick="event.stopPropagation();scanFish()">Scan</button>
+          <div class="errmsg" id="em"></div>
+        </div>
+
+        <!-- 스캔 결과 -->
+        <div class="rsec" id="rsec">
+          <div class="rname" id="rn"></div>
+          <div class="rlat" id="rl"></div>
+          <div class="rconf" id="rc"></div>
+          <div class="sec" style="padding-top:14px">기본 정보</div>
+          <div class="igrid">
+            <div class="chip"><div class="clbl">수명</div><div class="cval" id="rv1"></div></div>
+            <div class="chip"><div class="clbl">크기</div><div class="cval" id="rv2"></div></div>
+            <div class="chip"><div class="clbl">수온</div><div class="cval" id="rv3"></div></div>
+            <div class="chip"><div class="clbl">분류</div><div class="cval" id="rv4"></div></div>
+            <div class="chip"><div class="clbl">보존</div><div class="cval" id="rv5"></div></div>
+            <div class="chip"><div class="clbl">난이도</div><div class="cval" id="rv6"></div></div>
           </div>
+          <div class="sec">서식지</div>
+          <div class="box"><div class="boxt" id="rh"></div></div>
+          <div class="sec">특징 &amp; 생태</div>
+          <div class="plain" id="rd"></div>
+          <button class="ghost" onclick="resetScan()">+ 다른 물고기 스캔</button>
         </div>
-        <div class="errmsg" id="em"></div>
-      </div>
 
-      <div class="ctaw">
-        <button class="ctab" onclick="document.getElementById('fi').click()">
-          <div class="ctai"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-          <div><div class="ctam">새 물고기 스캔하기</div><div class="ctasb">사진으로 종 자동 인식 →</div></div>
-          <span class="ctarr">›</span>
-        </button>
-      </div>
-
-      <div class="rsec" id="rsec">
-        <div class="rname" id="rn"></div>
-        <div class="rlat" id="rl"></div>
-        <div class="rconf" id="rc"></div>
-        <div class="sec" style="padding-top:14px">기본 정보</div>
-        <div class="igrid">
-          <div class="chip"><div class="clbl">수명</div><div class="cval" id="rv1"></div></div>
-          <div class="chip"><div class="clbl">크기</div><div class="cval" id="rv2"></div></div>
-          <div class="chip"><div class="clbl">수온</div><div class="cval" id="rv3"></div></div>
-          <div class="chip"><div class="clbl">분류</div><div class="cval" id="rv4"></div></div>
-          <div class="chip"><div class="clbl">보존</div><div class="cval" id="rv5"></div></div>
-          <div class="chip"><div class="clbl">난이도</div><div class="cval" id="rv6"></div></div>
+        <!-- 컬렉션 -->
+        <div class="sec" id="clbl">내 컬렉션</div>
+        <div class="cgrid" id="cgrid"></div>
+        <div class="empty" id="emp" style="display:none">
+          <div class="empty-i">🔍</div>
+          <div class="empty-t">검색 결과 없음</div>
         </div>
-        <div class="sec">서식지</div>
-        <div class="box"><div class="boxt" id="rh"></div></div>
-        <div class="sec">특징 & 생태</div>
-        <div class="plain" id="rd"></div>
-        <button class="ghost" onclick="resetScan()">+ 다른 물고기 스캔</button>
-      </div>
-
-      <div class="sec" id="clbl">내 컬렉션</div>
-      <div class="cgrid" id="cgrid"></div>
-      <div class="empty" id="emp" style="display:none">
-        <div class="empty-i">🔍</div><div class="empty-t">검색 결과 없음</div>
       </div>
     </div>
 
+    <!-- 바텀 네비 -->
     <div class="bnav">
       <div class="ni active" onclick="setNav(this)">
-        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        <span class="nil">Scan</span>
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="nil">Home</span>
       </div>
       <div class="ni" onclick="setNav(this)">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         <span class="nil">Collection</span>
       </div>
+      <div style="flex:1;display:flex;justify-content:center">
+        <div class="ni-scan" onclick="document.getElementById(&#39;fi&#39;).click()">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+      </div>
       <div class="ni" onclick="setNav(this)">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         <span class="nil">Habitat</span>
-      </div>
-      <div class="ni" onclick="setNav(this)">
-        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        <span class="nil">Market</span>
       </div>
       <div class="ni" onclick="setNav(this)">
         <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -325,33 +375,33 @@ html,body{height:100%;overflow:hidden;background:#e8f4ff;font-family:'Inter',san
     </div>
   </div>
 
-  <!-- DETAIL -->
+  <!-- ════ DETAIL ════ -->
   <div class="screen" id="screen-detail">
-    <div class="scroll" style="padding-bottom:110px">
-      <div class="backrow" onclick="showScreen('home')">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        <span class="backlbl">Collection</span>
+    <div class="dscroll">
+      <div class="dback-area">
+        <div class="backrow" onclick="showScreen(&#39;home&#39;)">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          <span class="backlbl">Back</span>
+        </div>
+        <div class="dhero-inner">
+          <div class="dno" id="dno"></div>
+          <div class="demoji" id="demoji"></div>
+          <div class="dname" id="dname"></div>
+          <div class="dlatin" id="dlatin"></div>
+          <div class="brow" id="dbadges"></div>
+        </div>
       </div>
-      <div class="dhero">
-        <div class="dno" id="dno"></div>
-        <div class="demoji" id="demoji"></div>
-        <div class="dname" id="dname"></div>
-        <div class="dlatin" id="dlatin"></div>
-        <div class="brow" id="dbadges"></div>
+      <div class="d-white">
+        <div class="sec">기본 정보</div>
+        <div class="igrid" id="dinfo"></div>
+        <div class="sec">서식지 &amp; 분포</div>
+        <div class="box"><div class="boxt" id="dhab"></div></div>
+        <div class="sec">특징 &amp; 생태</div>
+        <div class="plain" id="ddesc"></div>
+        <div class="divl"></div>
+        <div class="sec">사육 팁</div>
+        <div id="dtips"></div>
       </div>
-      <div class="sec">기본 정보</div>
-      <div class="igrid" id="dinfo"></div>
-      <div class="sec">서식지 & 분포</div>
-      <div class="box"><div class="boxt" id="dhab"></div></div>
-      <div class="sec">특징 & 생태</div>
-      <div class="plain" id="ddesc"></div>
-      <div class="divl"></div>
-      <div class="sec">사육 팁</div>
-      <div id="dtips"></div>
-    </div>
-    <div class="buybar">
-      <div><div class="plbl">마켓 최저가</div><div class="pval" id="dprice"></div></div>
-      <button class="buybtn">구매하기</button>
     </div>
   </div>
 
@@ -359,67 +409,36 @@ html,body{height:100%;overflow:hidden;background:#e8f4ff;font-family:'Inter',san
 </div>
 
 <script>
-/* ══════════════════════════════════════════════════
-   AURORA — 애플 뮤직 스타일
-   포인트 이동 없음. 알파(밝기)만 sin으로 숨쉬듯 변화.
-   레퍼런스 컬러: 좌상 중간파랑, 우상 밝은파랑, 중앙 딥네이비
-══════════════════════════════════════════════════ */
+/* ── Aurora ── */
 (function(){
-  const canvas = document.getElementById('cv');
-  const ctx    = canvas.getContext('2d');
-  const app    = document.getElementById('app');
-
-  function resize(){
-    canvas.width  = app.offsetWidth  || 390;
-    canvas.height = app.offsetHeight || 844;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  /* 밝은 하늘색 포인트들 — 알파만 변화 (ZERO 레퍼런스 스타일) */
-  const pts = [
-    { x:0.15, y:0.12, r:0.95, R:147, G:197, B:253, base:0.55, amp:0.20, spd:0.0006, ph:0.0 },
-    { x:0.80, y:0.08, r:0.70, R:96,  G:165, B:250, base:0.65, amp:0.22, spd:0.0006, ph:1.8 },
-    { x:0.50, y:0.35, r:0.80, R:186, G:220, B:255, base:0.40, amp:0.18, spd:0.0006, ph:3.2 },
-    { x:0.10, y:0.55, r:0.65, R:59,  G:130, B:246, base:0.22, amp:0.12, spd:0.0006, ph:2.1 },
-    { x:0.85, y:0.40, r:0.55, R:125, G:180, B:255, base:0.30, amp:0.15, spd:0.0006, ph:4.0 },
+  const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),app=document.getElementById('app');
+  function resize(){cv.width=app.offsetWidth||390;cv.height=app.offsetHeight||844}
+  resize();window.addEventListener('resize',resize);
+  const pts=[
+    {x:.1,y:.08,r:.9,R:130,G:195,B:245,base:.55,amp:.22,spd:.0005,ph:0},
+    {x:.88,y:.15,r:.75,R:160,G:185,B:230,base:.5,amp:.2,spd:.0005,ph:2},
+    {x:.5,y:.45,r:.8,R:195,G:175,B:225,base:.35,amp:.18,spd:.0005,ph:3.5},
+    {x:.15,y:.75,r:.6,R:225,G:175,B:210,base:.3,amp:.15,spd:.0005,ph:1.5},
+    {x:.85,y:.65,r:.55,R:210,G:180,B:225,base:.28,amp:.15,spd:.0005,ph:4.2},
   ];
-
-  let t = 0;
-
+  let t=0;
   function draw(){
-    const W = canvas.width;
-    const H = canvas.height;
-
-    ctx.fillStyle = '#dbeafe';
-    ctx.fillRect(0, 0, W, H);
-
-    pts.forEach(p => {
-      const a   = p.base + p.amp * Math.sin(t * p.spd + p.ph);
-      const cx  = p.x * W;
-      const cy  = p.y * H;
-      const rad = p.r * Math.min(W, H);
-
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
-      g.addColorStop(0,    `rgba(${p.R},${p.G},${p.B},${a})`);
-      g.addColorStop(0.45, `rgba(${p.R},${p.G},${p.B},${a * 0.4})`);
-      g.addColorStop(0.80, `rgba(${p.R},${p.G},${p.B},${a * 0.08})`);
-      g.addColorStop(1,    `rgba(${p.R},${p.G},${p.B},0)`);
-
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
+    const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      const a=p.base+p.amp*Math.sin(t*p.spd+p.ph);
+      const g=ctx.createRadialGradient(p.x*W,p.y*H,0,p.x*W,p.y*H,p.r*Math.min(W,H));
+      g.addColorStop(0,`rgba(${p.R},${p.G},${p.B},${a})`);
+      g.addColorStop(.5,`rgba(${p.R},${p.G},${p.B},${a*.3})`);
+      g.addColorStop(1,`rgba(${p.R},${p.G},${p.B},0)`);
+      ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
     });
-
-    t++;
-    requestAnimationFrame(draw);
+    t++;requestAnimationFrame(draw);
   }
-
   draw();
 })();
 
-/* ══════════════════════════════════════════════════
-   DATA — 100종 DB (관상어·한국 근해·민물)
-══════════════════════════════════════════════════ */
+/* ── DATA ── */
+
 const FISH=[
   {id:'f001',emoji:'🐠',koreanName:'흰동가리',englishName:'Clownfish',scientificName:'Amphiprion ocellaris',classification:'농어목 자리돔과',lifespan:'6–10년',maxSize:'11 cm',temperature:'24–28°C',ph:'8.1–8.4',minTank:'76 L',conservationStatus:'LC',difficulty:'초보자',waterType:'해수',price:'₩ 15,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Clown_fish_in_the_Andaman_Coral_Reef.jpg/640px-Clown_fish_in_the_Andaman_Coral_Reef.jpg',habitat:'인도양 동부·서태평양 산호초 지대.',description:'주황·흰 줄무늬. 말미잘 공생. 순차적 자웅동체.',tips:['최소 76L 해수 수조','말미잘 없이도 사육 가능','수컷끼리 합사 금지']},
   {id:'f002',emoji:'🐟',koreanName:'베타',englishName:'Betta',scientificName:'Betta splendens',classification:'농어목 구라미과',lifespan:'2–4년',maxSize:'7 cm',temperature:'24–30°C',ph:'6.0–7.5',minTank:'20 L',conservationStatus:'VU',difficulty:'초보자',waterType:'담수',price:'₩ 5,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Betta_fish_%28Betta_splendens%29.jpg/640px-Betta_fish_%28Betta_splendens%29.jpg',habitat:'태국·캄보디아 논밭·연못.',description:'화려한 지느러미. 수컷 단독 사육 필수. 미로기관.',tips:['수컷 단독 사육','히터로 수온 유지','주 1회 환수']},
@@ -521,120 +540,112 @@ const FISH=[
   {id:'f098',emoji:'🐠',koreanName:'참붕어',englishName:'Pseudorasbora parva',scientificName:'Pseudorasbora parva',classification:'잉어목 잉어과',lifespan:'5–8년',maxSize:'11 cm',temperature:'5–25°C',ph:'6.5–8.0',minTank:'60 L',conservationStatus:'LC',difficulty:'초보자',waterType:'담수',price:'₩ 1,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Zacco_platypus.jpg/640px-Zacco_platypus.jpg',habitat:'한국·중국·일본 강·연못.',description:'한국 흔한 소형 담수어. 강건하고 적응력 뛰어남.',tips:['그룹 사육 권장','잡식성','저수온에도 강함']},
   {id:'f099',emoji:'🐟',koreanName:'은어',englishName:'Sweetfish',scientificName:'Plecoglossus altivelis',classification:'은어목 은어과',lifespan:'1–2년',maxSize:'30 cm',temperature:'10–20°C',ph:'6.5–7.5',minTank:'300 L',conservationStatus:'LC',difficulty:'고급자',waterType:'담수',price:'₩ 20,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Zacco_platypus.jpg/640px-Zacco_platypus.jpg',habitat:'한국·일본·중국 하천. 바다에서 부화 후 강으로 이동.',description:'한국 여름 최고 담수 식재료. 수박향. 텃세 강함.',tips:['맑고 차가운 물 필수','텃세 강함','회유성 — 사육 어려움']},
   {id:'f100',emoji:'🐠',koreanName:'버터플라이 피시',englishName:'African Butterfly Fish',scientificName:'Pantodon buchholzi',classification:'골설어목 나비고기과',lifespan:'5–10년',maxSize:'13 cm',temperature:'25–30°C',ph:'6.0–7.0',minTank:'100 L',conservationStatus:'LC',difficulty:'중급자',waterType:'담수',price:'₩ 20,000~',picture:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Pantodon_buchholzi.jpg/640px-Pantodon_buchholzi.jpg',habitat:'서아프리카 나이지리아·카메룬.',description:'크고 아름다운 가슴지느러미. 수면 근처 생활.',tips:['수면 위 공간 필요','뚜껑 필수','살아있는 곤충 선호']},
-]
+];
 
+
+/* ── 사진 로드 — Vercel 프록시 경유 ── */
+const photoCache={};
+async function loadPhoto(f){
+  if(photoCache[f.id]!==undefined) return photoCache[f.id];
+  if(f.picture){photoCache[f.id]=f.picture;return f.picture}
+  try{
+    // 학명 우선, 없으면 영문명
+    const q=f.scientificName||f.englishName||f.koreanName;
+    const res=await fetch(`/api/photo?q=${encodeURIComponent(q)}`);
+    if(!res.ok) throw new Error('no photo');
+    const d=await res.json();
+    photoCache[f.id]=d.url||null;
+    return d.url||null;
+  }catch{
+    photoCache[f.id]=null;return null;
+  }
+}
+
+/* ── RENDER ── */
 function renderGrid(data){
   data=data||FISH;
   const g=document.getElementById('cgrid'),e=document.getElementById('emp');
   if(!data.length){g.innerHTML='';e.style.display='block';return}
   e.style.display='none';
   g.innerHTML=data.map((f,i)=>`
-    <div class="ccard" style="animation-delay:${i*.07}s" data-id="${f.id}">
-      ${f.picture
-        ? `<div style="width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;margin-bottom:10px;background:rgba(255,255,255,0.05)"><img src="${f.picture}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.style.display='none'"></div>`
-        : `<div class="ce">${f.emoji}</div>`
-      }
-      <div class="cn">${f.koreanName}</div>
-      <div class="clat">${f.scientificName}</div>
-      <div class="cbadge" style="border-color:${f.waterType==='해수'?'rgba(160,190,255,0.35)':'rgba(134,239,172,0.35)'};color:${f.waterType==='해수'?'rgba(160,190,255,0.85)':'rgba(134,239,172,0.85)'}">${f.waterType}</div>
-      <div class="cprice">${f.price}</div>
+    <div class="ccard" style="animation-delay:${i*.05}s" data-id="${f.id}">
+      <div class="cimg" id="cimg-${f.id}">${f.emoji||'🐠'}</div>
+      <div class="ctxt">
+        <div class="cn">${f.koreanName}</div>
+        <div class="clat">${f.scientificName}</div>
+        <span class="cbadge ${f.waterType==='해수'?'cbadge-sea':'cbadge-fw'}">${f.waterType}</span>
+      </div>
     </div>`).join('');
-
-  /* 카드 클릭 이벤트 — data-id로 안전하게 */
-  g.querySelectorAll('.ccard').forEach(card=>{
-    card.addEventListener('click',()=>openDetail(card.dataset.id));
+  g.querySelectorAll('.ccard').forEach(c=>c.addEventListener('click',()=>openDetail(c.dataset.id)));
+  // 사진 비동기 로드
+  data.forEach(f=>{
+    loadPhoto(f).then(url=>{
+      if(!url) return;
+      const el=document.getElementById(`cimg-${f.id}`);
+      if(el) el.innerHTML=`<img src="${url}" alt="${f.koreanName}" onerror="this.parentElement.textContent='${f.emoji||'🐠'}'">`;
+    });
   });
 }
 
-/* 타이핑 중 — 컬렉션 내 필터만 */
+/* ── SEARCH ── */
 function onSearchFilter(q){
   document.getElementById('sclear').style.display=q?'block':'none';
   if(!q){document.getElementById('clbl').textContent='내 컬렉션';renderGrid(FISH);return}
-  const local=FISH.filter(f=>f.koreanName.includes(q)||f.englishName.toLowerCase().includes(q.toLowerCase())||f.scientificName.toLowerCase().includes(q.toLowerCase()));
-  document.getElementById('clbl').textContent='내 컬렉션';
-  renderGrid(local.length?local:FISH);
+  const r=FISH.filter(f=>f.koreanName.includes(q)||f.englishName.toLowerCase().includes(q.toLowerCase())||f.scientificName.toLowerCase().includes(q.toLowerCase()));
+  renderGrid(r.length?r:FISH);
 }
-
-/* 엔터 — iNaturalist API 검색 */
 async function searchFish(q){
   q=q.trim();if(!q)return;
   const lbl=document.getElementById('clbl');
   lbl.textContent='검색 중...';
-  document.getElementById('cgrid').innerHTML=`<div style="grid-column:span 2;padding:32px 0;text-align:center;font-size:13px;color:rgba(255,255,255,0.3);letter-spacing:.5px;">검색 중...</div>`;
-
-  /* 로컬 컬렉션에 있으면 바로 표시 */
+  document.getElementById('cgrid').innerHTML=`<div style="grid-column:span 2;padding:40px 0;text-align:center;font-size:14px;color:rgba(30,58,138,0.3);letter-spacing:.5px">검색 중…</div>`;
   const local=FISH.filter(f=>f.koreanName.includes(q)||f.englishName.toLowerCase().includes(q.toLowerCase())||f.scientificName.toLowerCase().includes(q.toLowerCase()));
-  if(local.length){lbl.textContent='검색 결과';renderGrid(local);return;}
-
+  if(local.length){lbl.textContent='검색 결과';renderGrid(local);return}
   try{
-    const res = await fetch(`/api/fish?q=${encodeURIComponent(q)}`);
-    if(!res.ok) throw new Error('not found');
-    const d = await res.json();
-
-    const lw = (d.habitat||'').toLowerCase()+(d.description||'').toLowerCase();
-    const waterType = ['marine','ocean','coral','reef','saltwater','sea'].some(k=>lw.includes(k)) ? '해수'
-                    : ['freshwater','river','lake','stream','pond'].some(k=>lw.includes(k)) ? '담수'
-                    : '미확인';
-
-    /* 고유 id 생성 */
-    const newId = 'u_' + Date.now();
-
-    const fish = {
-      id: newId,
-      emoji: '🐠',
-      koreanName:  d.koreanName  || d.englishName || d.scientificName,
-      englishName: d.englishName || '',
-      scientificName: d.scientificName || q,
-      classification: d.classification || '-',
-      lifespan:    d.lifespan    || '-',
-      maxSize:     d.maxSize     || '-',
-      temperature: d.temperature || '-',
-      ph:          d.ph          || '-',
-      minTank:     d.minTank     || '-',
-      conservationStatus: d.conservationStatus || 'LC',
-      difficulty:  d.difficulty  || '중급자',
-      waterType,
-      price: '시세 확인 중',
-      habitat:     d.habitat     || '-',
-      description: d.description || '-',
-      picture:     d.picture     || null,
-      tips: d.tips || ['전문 판매점에 문의해 적정 수조 크기를 확인하세요.','수질 및 수온을 종에 맞게 유지해주세요.'],
+    const res=await fetch(`/api/fish?q=${encodeURIComponent(q)}`);
+    if(!res.ok)throw new Error('not found');
+    const d=await res.json();
+    const lw=(d.habitat||'').toLowerCase()+(d.description||'').toLowerCase();
+    const waterType=['marine','ocean','coral','reef','saltwater','sea'].some(k=>lw.includes(k))?'해수':['freshwater','river','lake','stream'].some(k=>lw.includes(k))?'담수':'미확인';
+    const fish={
+      id:'u_'+Date.now(),emoji:'🐠',
+      koreanName:d.koreanName||d.englishName||q,
+      englishName:d.englishName||'',
+      scientificName:d.scientificName||q,
+      classification:d.classification||'-',lifespan:d.lifespan||'-',maxSize:d.maxSize||'-',
+      temperature:d.temperature||'-',ph:d.ph||'-',minTank:d.minTank||'-',
+      conservationStatus:d.conservationStatus||'LC',difficulty:d.difficulty||'중급자',
+      waterType,picture:d.picture||null,
+      habitat:d.habitat||'-',description:d.description||'-',
+      tips:d.tips||['전문 판매점에 문의하세요.']
     };
-
-    if(!FISH.find(x=>x.scientificName===fish.scientificName)) FISH.unshift(fish);
-    lbl.textContent='검색 결과';
-    renderGrid([fish]);
-
-  }catch(err){
+    if(!FISH.find(x=>x.scientificName===fish.scientificName))FISH.unshift(fish);
+    lbl.textContent='검색 결과';renderGrid([fish]);
+  }catch{
     lbl.textContent='검색 결과 없음';
-    document.getElementById('cgrid').innerHTML=`<div style="grid-column:span 2;padding:32px 0;text-align:center;font-size:13px;color:rgba(255,255,255,0.3);">"${q}" 결과를 찾지 못했어요</div>`;
+    document.getElementById('cgrid').innerHTML=`<div style="grid-column:span 2;padding:40px 0;text-align:center;font-size:14px;color:rgba(30,58,138,0.25)">"${q}" 결과를 찾지 못했어요</div>`;
   }
 }
-
 function clearSearch(){
-  document.getElementById('sclear').style.display='none';
   document.getElementById('sinput').value='';
+  document.getElementById('sclear').style.display='none';
   document.getElementById('clbl').textContent='내 컬렉션';
   renderGrid(FISH);
 }
 
-function openDetail(id){
-  const f=FISH.find(x=>x.id===id);
-  if(!f)return;
+/* ── DETAIL ── */
+async function openDetail(id){
+  const f=FISH.find(x=>x.id===id);if(!f)return;
   document.getElementById('dno').textContent='FISH MUSEUM · #'+f.id;
-  document.getElementById('demoji').textContent=f.picture?'':f.emoji;
-
-  /* 상세 이미지 */
-  const emojiEl = document.getElementById('demoji');
-  if(f.picture){
-    emojiEl.innerHTML=`<img src="${f.picture}" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-bottom:8px" onerror="this.outerHTML='${f.emoji}'">`;
-  } else {
-    emojiEl.textContent=f.emoji;
-  }
-
+  // 사진 or 이모지
+  const emojiEl=document.getElementById('demoji');
+  emojiEl.innerHTML=`<div style="font-size:60px;margin-bottom:4px">${f.emoji||'🐠'}</div>`;
+  loadPhoto(f).then(url=>{
+    if(!url)return;
+    emojiEl.innerHTML=`<img src="${url}" style="width:120px;height:120px;border-radius:20px;object-fit:cover;margin-bottom:4px;box-shadow:0 4px 20px rgba(30,58,138,0.18)" onerror="this.outerHTML='<div style=font-size:60px>${f.emoji||'🐠'}</div>'">`;
+  });
   document.getElementById('dname').textContent=f.koreanName;
   document.getElementById('dlatin').textContent=f.scientificName;
-  document.getElementById('dprice').textContent=f.price;
   document.getElementById('dhab').textContent=f.habitat;
   document.getElementById('ddesc').textContent=f.description;
   document.getElementById('dbadges').innerHTML=[
@@ -649,11 +660,19 @@ function openDetail(id){
   ].map(([l,v])=>`<div class="chip"><div class="clbl">${l}</div><div class="cval">${v||'-'}</div></div>`).join('');
   document.getElementById('dtips').innerHTML=(f.tips||[]).map(t=>`<div class="trow"><div class="tdot"></div><div class="ttxt">${t}</div></div>`).join('');
   showScreen('detail');
+  document.querySelector('.dscroll').scrollTop=0;
 }
 
-function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+n).classList.add('active')}
-function setNav(el){document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));el.classList.add('active')}
+function showScreen(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+n).classList.add('active');
+}
+function setNav(el){
+  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+}
 
+/* ── SCANNER ── */
 let b64=null,btype=null;
 document.getElementById('fi').addEventListener('change',e=>{
   const file=e.target.files[0];if(!file)return;
@@ -664,17 +683,15 @@ document.getElementById('fi').addEventListener('change',e=>{
     const p=document.getElementById('prev');p.src=ev.target.result;p.style.display='block';
     document.getElementById('idle').style.display='none';
     document.getElementById('sbt').style.display='block';
-    document.getElementById('ss').textContent='Ready to scan';
+    document.getElementById('ss').textContent='Ready';
     document.getElementById('rsec').style.display='none';
     document.getElementById('em').style.display='none';
   };
   r.readAsDataURL(file);
 });
-
 async function scanFish(){
   if(!b64)return;
-  const btn=document.getElementById('sbt');
-  btn.disabled=true;btn.textContent='…';
+  const btn=document.getElementById('sbt');btn.disabled=true;btn.textContent='…';
   document.getElementById('sl').style.display='block';
   document.getElementById('ss').textContent='Identifying...';
   document.getElementById('em').style.display='none';
@@ -684,12 +701,12 @@ async function scanFish(){
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
         messages:[{role:'user',content:[
           {type:'image',source:{type:'base64',media_type:btype,data:b64}},
-          {type:'text',text:'You are an expert ichthyologist. Identify this fish. Return ONLY valid JSON:\n{"koreanName":"","englishName":"","scientificName":"","confidence":"높음/중간/낮음","classification":"","lifespan":"","maxSize":"","temperature":"","conservationStatus":"IUCN등급","difficulty":"초보자/중급/고급","waterType":"해수/담수","habitat":"(한국어 2-3문장)","description":"(한국어 3-4문장)"}\nIf no fish, set koreanName to "인식불가".'}
+          {type:'text',text:'Identify this fish. Return ONLY valid JSON: {"koreanName":"","englishName":"","scientificName":"","confidence":"높음/중간/낮음","classification":"","lifespan":"","maxSize":"","temperature":"","conservationStatus":"IUCN","difficulty":"초보자/중급/고급","waterType":"해수/담수","habitat":"(한국어 2문장)","description":"(한국어 3문장)"} If not a fish set koreanName to "인식불가".'}
         ]}]})
     });
     const data=await res.json();
     const raw=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-    const m=raw.match(/\{[\s\S]*\}/);if(!m)throw new Error('파싱 실패');
+    const m=raw.match(/\{[\s\S]*?\}/);if(!m)throw new Error('parse');
     const f=JSON.parse(m[0]);
     if(f.koreanName==='인식불가'){showErr('물고기를 인식하지 못했어요.');return}
     document.getElementById('rn').textContent=f.koreanName;
@@ -703,11 +720,11 @@ async function scanFish(){
     document.getElementById('rsec').style.display='block';
     document.getElementById('ss').textContent='Complete';
     if(!FISH.find(x=>x.scientificName===f.scientificName)){
-      FISH.unshift({id:String(Date.now()).slice(-4),emoji:'🐠',koreanName:f.koreanName,englishName:f.englishName,scientificName:f.scientificName,classification:f.classification,lifespan:f.lifespan,maxSize:f.maxSize,temperature:f.temperature,ph:'-',minTank:'-',conservationStatus:f.conservationStatus,difficulty:f.difficulty,waterType:f.waterType||'미확인',price:'시세 확인 중',habitat:f.habitat,description:f.description,tips:['사육 정보 확인 중']});
+      FISH.unshift({id:'u_'+Date.now(),emoji:'🐠',koreanName:f.koreanName,englishName:f.englishName,scientificName:f.scientificName,classification:f.classification,lifespan:f.lifespan,maxSize:f.maxSize,temperature:f.temperature,ph:'-',minTank:'-',conservationStatus:f.conservationStatus,difficulty:f.difficulty,waterType:f.waterType||'미확인',picture:null,habitat:f.habitat,description:f.description,tips:['사육 정보를 확인하세요.']});
       renderGrid();
     }
   }catch(err){showErr('오류: '+err.message)}
-  finally{document.getElementById('sl').style.display='none';btn.disabled=false;btn.textContent='Scan'}
+  finally{document.getElementById('sl').style.display='none';btn.disabled=false;btn.textContent='Identify'}
 }
 function showErr(msg){
   const el=document.getElementById('em');el.textContent=msg;el.style.display='block';
@@ -725,7 +742,6 @@ function resetScan(){
   document.getElementById('ss').textContent='Ready';
   document.getElementById('fi').value='';
 }
-
 renderGrid();
 </script>
 </body>
